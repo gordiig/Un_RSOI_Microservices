@@ -31,3 +31,21 @@ class RegisterTestCase(BaseTestCase):
 
     def testWrong(self):
         _ = self.post_response_and_check_status(url=self.url, data=self.data_400, expected_status_code=400)
+
+
+class UserInfoTestCase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.url = self.url_prefix + 'user_info/'
+
+    def testNoAuth(self):
+        _ = self.get_response_and_check_status(url=self.url, expected_status_code=403)
+
+    def testAuth(self):
+        response = self.get_response_and_check_status(url=self.url, auth=True, expected_status_code=200)
+        try:
+            self.assertEqual(response['username'], self.user.username)
+            self.assertEqual(response['email'], self.user.email)
+            self.assertEqual(response['id'], self.user.id)
+        except KeyError:
+            self.assertTrue(False, msg='Key error')
