@@ -6,6 +6,8 @@ class Message(models.Model):
     Модель сообщения
     """
     uuid = models.UUIDField(primary_key=True)
+    from_user_uuid = models.UUIDField(null=False)
+    to_user_uuid = models.UUIDField(null=False)
     text = models.CharField(null=True, max_length=2048)
     image_uuid = models.UUIDField(null=True)
     audio_uuid = models.UUIDField(null=True)

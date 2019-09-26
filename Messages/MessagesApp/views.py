@@ -1,3 +1,30 @@
-from django.shortcuts import render
+from rest_framework import status
+from rest_framework.views import APIView, Response, Request
+from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from MessagesApp.serializers import MessageSerializer, ConcreteMessageSerializer
+from MessagesApp.models import Message
 
-# Create your views here.
+
+class AllMessagesView(ListAPIView):
+    """
+    Вьюха для вывода всех сообщений (просто для наглядности, понятно что это плохо)
+    """
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        return Message.objects.all()
+
+
+class MessagesView(ListCreateAPIView):
+    """
+    Вьюха для вывода всех сообщений пользователя
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        pass
+
+    def post(self, request, *args, **kwargs):
+        pass
