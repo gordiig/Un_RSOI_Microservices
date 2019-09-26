@@ -1,10 +1,13 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 
 def api_response_decorator(method_to_decorate):
-    def wrapper(self, url: str, data: dict={}, expected_status_code: int=200):
+    def wrapper(self, url: str, data: dict={}, expected_status_code: int=200, auth: bool=False):
         client = APIClient()
+        if auth:
+            client.force_authenticate(user=self.user)
 
         response = method_to_decorate(self, url=url, data=data, expected_status_code=expected_status_code,
                                       client=client)
@@ -25,6 +28,7 @@ def api_response_decorator(method_to_decorate):
 class BaseTestCase(TestCase):
     def setUp(self):
         self.url_prefix = '/api/'
+        self.user, _ = User.objects.get_or_create(username='Test', password='Test')
 
     @api_response_decorator
     def get_response_and_check_status(self, url: str, data: dict={}, expected_status_code: int=200, client=None):
