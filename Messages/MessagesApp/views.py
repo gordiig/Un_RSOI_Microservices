@@ -16,15 +16,17 @@ class AllMessagesView(ListAPIView):
         return Message.objects.all()
 
 
-class MessagesView(ListCreateAPIView):
+class MessagesView(APIView):
     """
     Вьюха для вывода всех сообщений пользователя
     """
     permission_classes = (IsAuthenticated, )
     serializer_class = MessageSerializer
 
-    def get_queryset(self):
-        pass
+    def get_queryset(self, request: Request, *args, **kwargs):
+        query_params = request.query_params
+        try:
 
-    def post(self, request, *args, **kwargs):
+
+    def post(self, request: Request, *args, **kwargs):
         pass
