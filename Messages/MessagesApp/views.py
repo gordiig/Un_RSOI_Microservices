@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework.views import APIView, Response, Request
-from rest_framework.generics import ListCreateAPIView
 from django.db.models import Q
 from MessagesApp.serializers import MessageSerializer
 from MessagesApp.models import Message
@@ -11,10 +10,6 @@ class AllMessagesView(APIView):
     Вьюха для вывода всех сообщений и добавления нового
     """
     def get(self, request: Request):
-        if len(request.query_params) == 0:
-            # Вообще все
-            return Response(MessageSerializer(instance=Message.objects.all(), many=True).data)
-        # Для определенного юзера
         try:
             user_id = request.query_params['user_id']
         except KeyError:
@@ -42,7 +37,7 @@ class ConcreteMessageView(APIView):
             msg = Message.objects.get(pk=message_uuid)
         except Message.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = MessageSerializer(data=msg)
+        serializer = MessageSerializer(instance=msg)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, message_uuid):
