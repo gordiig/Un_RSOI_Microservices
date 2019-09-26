@@ -37,17 +37,17 @@ class ConcreteMessageView(APIView):
     """
     Вьюха для отображения конкретного сообщения
     """
-    def get(self, request: Request, message_id):
+    def get(self, request: Request, message_uuid):
         try:
-            msg = Message.objects.get(pk=message_id)
+            msg = Message.objects.get(pk=message_uuid)
         except Message.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = MessageSerializer(data=msg)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request: Request, message_id):
+    def delete(self, request: Request, message_uuid):
         try:
-            msg = Message.objects.get(pk=message_id)
+            msg = Message.objects.get(pk=message_uuid)
         except Message.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         msg.delete()
