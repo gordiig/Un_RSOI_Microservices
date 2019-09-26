@@ -22,7 +22,7 @@ class RegisterView(APIView):
     Вьюха для регистрации
     """
     def post(self, request: Request, *args, **kwargs):
-        serializer = UserSerializer(instance=request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
