@@ -31,26 +31,31 @@ class BaseTestCase(TestCase):
         self.user, _ = User.objects.get_or_create(username='Test', password='Test')
 
     @api_response_decorator
-    def get_response_and_check_status(self, url: str, data: dict={}, expected_status_code: int=200, client=None):
+    def get_response_and_check_status(self, url: str, data: dict={}, expected_status_code: int=200, client=None,
+                                      auth: bool=False):
         response = client.get(url)
         return response
 
     @api_response_decorator
-    def post_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 201, client=None):
+    def post_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 201, client=None,
+                                       auth: bool=False):
         response = client.post(url, data=data)
         return response
 
     @api_response_decorator
-    def patch_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 200, client=None):
+    def patch_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 200, client=None,
+                                        auth: bool=False):
         response = client.patch(url, data=data)
         return response
 
     @api_response_decorator
-    def delete_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 204, client=None):
+    def delete_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 204, client=None,
+                                         auth: bool=False):
         response = client.delete(url)
         return response
 
     @api_response_decorator
-    def put_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 200, client=None):
+    def put_response_and_check_status(self, url: str, data: dict = {}, expected_status_code: int = 200, client=None,
+                                      auth: bool=False):
         response = client.put(url, data=data)
         return response
