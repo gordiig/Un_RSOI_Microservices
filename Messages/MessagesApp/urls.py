@@ -1,8 +1,9 @@
-from django.urls import path
+from django.conf.urls import url
+from MessagesApp import views
 
 
 url_patterns = [
-    path('all/'),
-    path(''),
-    path('<slug::uuid>/'),
+    url('^messages/all/$', views.AllMessagesView.as_view()),
+    url('^messages/$', views.MessagesView.as_view()),
+    url('^messages/(?P<message_id>\w+)/$', views.ConcreteMessageView.as_view()),
 ]
