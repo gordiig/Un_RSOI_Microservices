@@ -1,3 +1,4 @@
+import uuid
 from TestUtils.models import BaseTestCase
 from ImagesApp.models import Image
 
@@ -49,3 +50,34 @@ class ImagesListTestCase(BaseTestCase):
         self.assertEqual(new.name, self.data_201['name'])
         self.assertEqual(new.width, self.data_201['width'])
         self.assertEqual(new.height, self.data_201['height'])
+
+
+class ConcreteImageViewTestCase(BaseTestCase):
+    """
+    Тесты для ендпоинта /api/images/<image_uuid>/
+    """
+    def setUp(self):
+        super().setUp()
+        self.image, _ = Image.objects.get_or_create(name='test', width=300, height=300)
+        uuid_tmp = uuid.uuid4()
+        self.url_404 = self.url_prefix + f'images/{uuid_tmp}/'
+        while uuid_tmp == self.image.uuid:
+            uuid_tmp = uuid.uuid4()
+            self.url_404 = self.url_prefix + f'images/{uuid_tmp}/'
+        self.url = self.url_prefix + f'images/{self.image.uuid}/'
+
+    def testGet404(self):
+        _ = self.get_response_and_check_status(url=self.url_404, expected_status_code=404)
+
+    def testDelete404(self):
+        _ = self.delete_response_and_check_status(url=self.url_404, expected_status_code=404)
+
+    def testGet(self):
+        response = self.get_response_and_check_status(url=self.url, expected_status_code=200)
+        self.assertEqual(response['uuid'], str(self.image.uuid))
+        self.assertEqual(response['name'], self.image.name)
+        self.assertEqual(response['image_size'], self.image.image_size)
+
+    def testDelete(self):
+        _ = self.delete_response_and_check_status(url=self.url, expected_status_code=204)
+        self.assertEqual(Image.objects.count(), 0)
