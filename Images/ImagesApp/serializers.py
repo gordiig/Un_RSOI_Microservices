@@ -13,12 +13,14 @@ class ImageSerializer(serializers.ModelSerializer):
             'name',
             'extension',
             'image_size',
+            'width',
+            'height'
         ]
+        extra_kwargs = {
+            'width': {'write_only': True},
+            'height': {'write_only': True},
+        }
 
     def create(self, validated_data):
-        width, height = validated_data['image_size'].split('x')
         new_image = Image.objects.create(**validated_data)
-        new_image.width = width
-        new_image.height = height
-        new_image.save()
         return new_image

@@ -10,7 +10,7 @@ class ImagesView(ListCreateAPIView):
     Вьюха для списка изображений
     """
     serializer_class = ImageSerializer
-    
+
     def get_queryset(self):
         return Image.objects.all()
 
