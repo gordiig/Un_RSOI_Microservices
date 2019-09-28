@@ -41,7 +41,7 @@ class ConcreteImageView(APIView):
 
 
 # MARK: - Сообщения
-class MessageView(APIView):
+class MessagesView(APIView):
     """
     Получение всех картинок
     """
