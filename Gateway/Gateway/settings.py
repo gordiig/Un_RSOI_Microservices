@@ -25,7 +25,7 @@ SECRET_KEY = '127ltuza#a*xfcp7u2im9vn8pzko%*#jdb30!=xa2@+3mi8z0e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'GatewayApp',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +70,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Gateway.wsgi.application'
+
+
+# REST_Framework
+renderer_classes = ['rest_framework.renderers.JSONRenderer']
+if DEBUG:
+    renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': renderer_classes,
+}
 
 
 # Database
