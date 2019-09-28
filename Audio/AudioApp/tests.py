@@ -47,3 +47,32 @@ class AudiosViewTestCase(BaseTestCase):
         self.assertEqual(new.length, self.data_201['length'])
 
 
+class ConcreteAudioViewTestCase(BaseTestCase):
+    """
+    Тесты для ендпоинта /api/audio/<audio_uuid>/
+    """
+    def setUp(self):
+        super().setUp()
+        self.audio, _ = Audio.objects.get_or_create(name='test', length=60)
+        uuid_tmp = uuid.uuid4()
+        self.url = self.url_prefix + f'audio/{str(self.audio.uuid)}/'
+        self.url_404 = self.url_prefix + f'audio/{uuid_tmp}/'
+        while uuid_tmp == str(self.audio.uuid):
+            uuid_tmp = uuid.uuid4()
+            self.url_404 = self.url_prefix + f'audio/{uuid_tmp}/'
+
+    def testGet404(self):
+        _ = self.get_response_and_check_status(url=self.url_404, expected_status_code=404)
+
+    def testDelete404(self):
+        _ = self.delete_response_and_check_status(url=self.url_404, expected_status_code=404)
+
+    def testGet(self):
+        response = self.get_response_and_check_status(url=self.url, expected_status_code=200)
+        self.assertEqual(response['uuid'], str(self.audio.uuid))
+        self.assertEqual(response['name'], self.audio.name)
+        self.assertEqual(response['length'], self.audio.length)
+
+    def testDelete(self):
+        _ = self.delete_response_and_check_status(url=self.url, expected_status_code=204)
+        self.assertEqual(Audio.objects.count(), 0)
