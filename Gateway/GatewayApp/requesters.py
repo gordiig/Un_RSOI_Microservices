@@ -18,7 +18,7 @@ class AudioGetError(Exception):
 
 
 class Requester:
-    AUTH_HOST = '127.0.0.1:8001/'
+    AUTH_HOST = '127.0.0.1:8001/api/'
     MESSAGES_HOST = '127.0.0.1:8002/api/messages/'
     IMAGES_HOST = '127.0.0.1:8003/api/images/'
     AUDIOS_HOST = '127.0.0.1:8004/api/audio/'
@@ -35,6 +35,26 @@ class Requester:
         except requests.exceptions.BaseHTTPError:
             return None
         return response
+
+    @staticmethod
+    def perform_post_request(url: str, data: dict) -> Union[requests.Response, None]:
+        try:
+            response = requests.post(url=url, data=data)
+        except requests.exceptions.BaseHTTPError:
+            return None
+        return response
+
+    # MARK: - Auth
+    @staticmethod
+    def authenticate(username: str, password: str) -> Union[str, Tuple[Dict, int]]:
+        response = Requester.perform_post_request(Requester.AUTH_HOST + 'token-auth/', data={
+            'username': username,
+            'password': password,
+        })
+        if response.status_code != 200:
+            return response.json(), response.status_code
+        return response.json()['token']
+
 
     # MARK: - Images
     @staticmethod
