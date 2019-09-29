@@ -96,7 +96,9 @@ class MessagesView(APIView):
     permission_classes = (IsAuthenticatedThroughAuthService, )
 
     def get(self, request: Request):
-        data, code = Requester.get_messages()
+        if 'user_id' not in request.query_params.keys():
+            return Response({'error': 'No user_id in query params'}, status=400)
+        data, code = Requester.get_messages(user_id=request.query_params['user_id'])
         return Response(data, status=code)
 
 

@@ -127,9 +127,9 @@ class Requester:
         return message
 
     @staticmethod
-    def get_messages() -> Tuple[Union[List, Dict], int]:
+    def get_messages(user_id: int) -> Tuple[Union[List, Dict], int]:
         # Получаем сообщения
-        response = Requester.perform_get_request(Requester.MESSAGES_HOST)
+        response = Requester.perform_get_request(Requester.MESSAGES_HOST + f'?user_id={user_id}/')
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
