@@ -73,6 +73,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Auth.wsgi.application'
 
 
+# REST_FRAMEWORK settings
+renderer_classes = ['rest_framework.renderers.JSONRenderer']
+if DEBUG:
+    renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': renderer_classes,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication',
+   ),
+}
+
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
