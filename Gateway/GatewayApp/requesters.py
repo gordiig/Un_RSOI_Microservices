@@ -70,8 +70,6 @@ class Requester:
         response = Requester.perform_get_request(Requester.IMAGES_HOST)
         if response is None:
             return Requester.ERROR_RETURN
-        if response.status_code != 200:
-            return response.json(), response.status_code
         return response.json(), response.status_code
 
     @staticmethod
@@ -79,8 +77,6 @@ class Requester:
         response = Requester.perform_get_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
-        if response.status_code != 200:
-            return response.json(), response.status_code
         return response.json(), response.status_code
 
     # MARK: - Audio
@@ -89,8 +85,6 @@ class Requester:
         response = Requester.perform_get_request(Requester.AUDIOS_HOST)
         if response is None:
             return Requester.ERROR_RETURN
-        if response.status_code != 200:
-            return response.json(), response.status_code
         return response.json(), response.status_code
 
     @staticmethod
@@ -98,8 +92,6 @@ class Requester:
         response = Requester.perform_get_request(Requester.AUDIOS_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
-        if response.status_code != 200:
-            return response.json(), response.status_code
         return response.json(), response.status_code
 
     # MARK: - Messages
