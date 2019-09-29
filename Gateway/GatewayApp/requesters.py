@@ -31,7 +31,7 @@ class Requester:
     @staticmethod
     def perform_request(url: str) -> Union[requests.Response, None]:
         try:
-            response = requests.get(Requester.IMAGES_HOST)
+            response = requests.get(url)
         except requests.exceptions.BaseHTTPError:
             return None
         return response
