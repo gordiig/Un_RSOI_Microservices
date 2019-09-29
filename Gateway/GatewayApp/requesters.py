@@ -55,6 +55,14 @@ class Requester:
             return response.json(), response.status_code
         return response.json()['token']
 
+    @staticmethod
+    def register(username: str, email: str, password: str) -> Tuple[Dict, int]:
+        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'register/', data={
+            'username': username,
+            'password': password,
+            'email': email,
+        })
+        return response.json(), response.status_code
 
     # MARK: - Images
     @staticmethod
