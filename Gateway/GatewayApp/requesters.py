@@ -29,7 +29,7 @@ class Requester:
         return json.dumps({'error': msg})
 
     @staticmethod
-    def perform_request(url: str) -> Union[requests.Response, None]:
+    def perform_get_request(url: str) -> Union[requests.Response, None]:
         try:
             response = requests.get(url)
         except requests.exceptions.BaseHTTPError:
@@ -59,7 +59,7 @@ class Requester:
     # MARK: - Images
     @staticmethod
     def get_images() -> Tuple[List, int]:
-        response = Requester.perform_request(Requester.IMAGES_HOST)
+        response = Requester.perform_get_request(Requester.IMAGES_HOST)
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
@@ -68,7 +68,7 @@ class Requester:
 
     @staticmethod
     def get_concrete_image(uuid: str) -> Tuple[Dict, int]:
-        response = Requester.perform_request(Requester.IMAGES_HOST + f'{uuid}/')
+        response = Requester.perform_get_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
@@ -78,7 +78,7 @@ class Requester:
     # MARK: - Audio
     @staticmethod
     def get_audios() -> Tuple[List, int]:
-        response = Requester.perform_request(Requester.AUDIOS_HOST)
+        response = Requester.perform_get_request(Requester.AUDIOS_HOST)
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
@@ -87,7 +87,7 @@ class Requester:
 
     @staticmethod
     def get_concrete_audio(uuid: str) -> Tuple[Dict, int]:
-        response = Requester.perform_request(Requester.AUDIOS_HOST + f'{uuid}/')
+        response = Requester.perform_get_request(Requester.AUDIOS_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
@@ -124,7 +124,7 @@ class Requester:
     @staticmethod
     def get_messages() -> Tuple[Union[List, Dict], int]:
         # Получаем сообщения
-        response = Requester.perform_request(Requester.MESSAGES_HOST)
+        response = Requester.perform_get_request(Requester.MESSAGES_HOST)
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
@@ -144,7 +144,7 @@ class Requester:
 
     @staticmethod
     def get_concrete_message(uuid: str) -> Tuple[Dict, int]:
-        response = Requester.perform_request(Requester.MESSAGES_HOST + f'{uuid}/')
+        response = Requester.perform_get_request(Requester.MESSAGES_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
