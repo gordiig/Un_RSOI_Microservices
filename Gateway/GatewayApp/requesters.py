@@ -39,7 +39,7 @@ class Requester:
     @staticmethod
     def perform_post_request(url: str, data: dict={}, headers: dict={}) -> Union[requests.Response, None]:
         try:
-            response = requests.post(url=url, json=json.dumps(data), headers=headers)
+            response = requests.post(url=url, json=data, headers=headers)
         except requests.exceptions.BaseHTTPError:
             return None
         return response
