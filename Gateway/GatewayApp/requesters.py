@@ -51,9 +51,7 @@ class Requester:
             'username': username,
             'password': password,
         })
-        if response.status_code != 200:
-            return response.json(), response.status_code
-        return response.json()['token']
+        return response.json(), response.status_code
 
     @staticmethod
     def register(username: str, email: str, password: str) -> Tuple[Dict, int]:
