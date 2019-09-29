@@ -29,17 +29,17 @@ class Requester:
         return json.dumps({'error': msg})
 
     @staticmethod
-    def perform_get_request(url: str) -> Union[requests.Response, None]:
+    def perform_get_request(url: str, headers: dict={}) -> Union[requests.Response, None]:
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=headers)
         except requests.exceptions.BaseHTTPError:
             return None
         return response
 
     @staticmethod
-    def perform_post_request(url: str, data: dict) -> Union[requests.Response, None]:
+    def perform_post_request(url: str, data: dict={}, headers: dict={}) -> Union[requests.Response, None]:
         try:
-            response = requests.post(url=url, data=data)
+            response = requests.post(url=url, json=json.dumps(data), headers=headers)
         except requests.exceptions.BaseHTTPError:
             return None
         return response
@@ -61,6 +61,13 @@ class Requester:
             'username': username,
             'password': password,
             'email': email,
+        })
+        return response.json(), response.status_code
+
+    @staticmethod
+    def get_user_info(token: str) -> Tuple[Dict, int]:
+        response = Requester.perform_get_request(url=Requester.AUTH_HOST + 'user_info/', headers={
+            'Authorization': f'Token {token}',
         })
         return response.json(), response.status_code
 
