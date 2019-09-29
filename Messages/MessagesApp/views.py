@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.views import APIView, Response, Request
+from rest_framework.pagination import LimitOffsetPagination
 from django.db.models import Q
 from MessagesApp.serializers import MessageSerializer
 from MessagesApp.models import Message
@@ -17,7 +18,9 @@ class AllMessagesView(APIView):
         msgs = Message.objects.filter(Q(from_user_id=user_id) | Q(to_user_id=user_id))
         if len(msgs) == 0:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = MessageSerializer(instance=msgs, many=True)
+        paginator = LimitOffsetPagination()
+        results = paginator.paginate_queryset(msgs, request)
+        serializer = MessageSerializer(instance=results, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request: Request):
