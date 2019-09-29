@@ -97,7 +97,10 @@ class Requester:
         response = Requester.perform_get_request(Requester.AUDIOS_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     # MARK: - Messages
     @staticmethod
@@ -106,6 +109,9 @@ class Requester:
         if image_uuid is not None:
             image_json, image_status = Requester.get_concrete_image(image_uuid)
             if image_status != 200:
+                if (not isinstance(image_json, dict)) and len(image_json) == 0:
+                    raise ImageGetError(code=image_status,
+                                        err_json={'error': f'Error with getting image, uuid: {image_uuid}!'})
                 raise ImageGetError(code=image_status, err_json=image_json)
             message['image'] = image_json
         return message
@@ -116,6 +122,9 @@ class Requester:
         if audio_uuid is not None:
             audio_json, audio_status = Requester.get_concrete_audio(audio_uuid)
             if audio_status != 200:
+                if (not isinstance(audio_json, dict)) and len(audio_json) == 0:
+                    raise AudioGetError(code=audio_status,
+                                        err_json={'error': f'Error with getting audio, uuid: {audio_uuid}'})
                 raise AudioGetError(code=audio_status, err_json=audio_json)
             message['audio'] = audio_json
         return message
@@ -129,7 +138,7 @@ class Requester:
     @staticmethod
     def get_messages(user_id: int) -> Tuple[Union[List, Dict], int]:
         # Получаем сообщения
-        response = Requester.perform_get_request(Requester.MESSAGES_HOST + f'?user_id={user_id}/')
+        response = Requester.perform_get_request(Requester.MESSAGES_HOST + f'?user_id={user_id}')
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
