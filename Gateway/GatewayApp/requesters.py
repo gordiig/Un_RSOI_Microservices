@@ -18,10 +18,10 @@ class AudioGetError(Exception):
 
 
 class Requester:
-    AUTH_HOST = '127.0.0.1:8001/api/'
-    MESSAGES_HOST = '127.0.0.1:8002/api/messages/'
-    IMAGES_HOST = '127.0.0.1:8003/api/images/'
-    AUDIOS_HOST = '127.0.0.1:8004/api/audio/'
+    AUTH_HOST = 'http://127.0.0.1:8001/api/'
+    MESSAGES_HOST = 'http://127.0.0.1:8002/api/messages/'
+    IMAGES_HOST = 'http://127.0.0.1:8003/api/images/'
+    AUDIOS_HOST = 'http://127.0.0.1:8004/api/audio/'
     ERROR_RETURN = (json.dumps({'error': 'BaseHTTPError was raised!'}), 500)
 
     @staticmethod
