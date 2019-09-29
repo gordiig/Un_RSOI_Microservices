@@ -34,7 +34,7 @@ class GetUserInfoView(APIView):
     Получение инфы о юзере по токену
     """
     def get(self, request: Request):
-        token_str = request.META.get('Authorization')
+        token_str = request.META.get('HTTP_AUTHORIZATION')
         if token_str is None:
             return Response({'error': 'No Authorization header!'}, status=400)
         token = token_str[6:]
