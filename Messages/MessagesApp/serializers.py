@@ -27,3 +27,5 @@ class MessageSerializer(serializers.ModelSerializer):
         instance.text = validated_data.get('text', instance.text)
         instance.image_uuid = validated_data.get('image_uuid', instance.image_uuid)
         instance.audio_uuid = validated_data.get('audio_uuid', instance.audio_uuid)
+        instance.save()
+        return instance

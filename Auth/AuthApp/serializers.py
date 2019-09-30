@@ -30,4 +30,5 @@ class UserSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         new_pass = validated_data['password']
         instance.set_password(new_pass)
+        instance.save()
         return instance

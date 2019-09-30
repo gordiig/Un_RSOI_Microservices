@@ -29,3 +29,5 @@ class ImageSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.width = validated_data.get('width', instance.width)
         instance.height = validated_data.get('height', instance.height)
+        instance.save()
+        return instance
