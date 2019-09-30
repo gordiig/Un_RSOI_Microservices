@@ -124,7 +124,10 @@ class Requester:
         response = Requester.perform_delete_request(url=Requester.AUTH_HOST + 'user_info/', headers={
             'Authorization': f'Token {token}',
         })
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     # MARK: - Images
     @staticmethod
@@ -164,7 +167,10 @@ class Requester:
         response = Requester.perform_delete_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     # MARK: - Audio
     @staticmethod
@@ -207,7 +213,10 @@ class Requester:
         response = Requester.perform_delete_request(Requester.AUDIOS_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     # MARK: - Messages
     @staticmethod
@@ -343,7 +352,10 @@ class Requester:
         response = Requester.perform_delete_request(Requester.MESSAGES_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
-        ans_json = response.json()
+        try:
+            ans_json = response.json()
+        except json.JSONDecodeError:
+            ans_json = {}
         if len(errors) != 0:
             ans_json['errors'] = errors
         return ans_json, response.status_code
