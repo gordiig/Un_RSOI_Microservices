@@ -72,6 +72,10 @@ class ConcreteAudioView(APIView):
         data, code = Requester.get_concrete_audio(str(audio_uuid))
         return Response(data, status=code)
 
+    def patch(self, request: Request, audio_uuid):
+        data, code = Requester.patch_audio(audio_uuid, request.data)
+        return Response(data, status=code)
+
     def delete(self, request: Request, audio_uuid):
         data, code = Requester.delete_audio(str(audio_uuid))
         return Response(data, status=code)
@@ -104,6 +108,10 @@ class ConcreteImageView(APIView):
 
     def get(self, request: Request, image_uuid):
         data, code = Requester.get_concrete_image(str(image_uuid))
+        return Response(data, status=code)
+
+    def patch(self, request: Request, image_uuid):
+        data, code = Requester.patch_image(image_uuid, request.data)
         return Response(data, status=code)
 
     def delete(self, request: Request, image_uuid):
@@ -144,6 +152,10 @@ class ConcreteMessageView(APIView):
 
     def get(self, request: Request, message_uuid):
         data, code = Requester.get_concrete_message(str(message_uuid))
+        return Response(data, status=code)
+
+    def patch(self, request: Request, message_uuid):
+        data, code = Requester.patch_message(message_uuid, request.data)
         return Response(data, status=code)
 
     def delete(self, request: Request, message_uuid):
