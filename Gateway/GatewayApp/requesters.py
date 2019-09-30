@@ -49,7 +49,7 @@ class Requester:
     def __next_and_prev_links_to_params__(data: dict) -> dict:
         try:
             next_link, prev_link = data['next'], data['previous']
-        except KeyError:
+        except (KeyError, TypeError):
             return data
         if next_link:
             substr = re.findall(r'^limit=\d+&offset=\d+', next_link)
