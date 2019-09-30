@@ -128,7 +128,11 @@ class MessagesView(APIView):
         return Response(data, status=code)
 
     def post(self, request: Request):
-        data, code = Requester.post_message(request.data)
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        data, code = Requester.post_message(token, request.data)
         return Response(data, status=code)
 
 

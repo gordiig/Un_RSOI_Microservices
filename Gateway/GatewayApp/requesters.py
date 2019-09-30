@@ -93,12 +93,19 @@ class Requester:
 
     @staticmethod
     def register(data: dict) -> Tuple[Dict, int]:
-        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'register/', data=data)
+        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'users/', data=data)
         return response.json(), response.status_code
 
     @staticmethod
     def get_user_info(token: str) -> Tuple[Dict, int]:
         response = Requester.perform_get_request(url=Requester.AUTH_HOST + 'user_info/', headers={
+            'Authorization': f'Token {token}',
+        })
+        return response.json(), response.status_code
+
+    @staticmethod
+    def get_concrete_user(token: str, user_id: str) -> Tuple[Dict, int]:
+        response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'user/{user_id}', headers={
             'Authorization': f'Token {token}',
         })
         return response.json(), response.status_code
@@ -146,6 +153,13 @@ class Requester:
         return response.json(), response.status_code
 
     @staticmethod
+    def patch_image(uuid: str, data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_patch_request(url=Requester.IMAGES_HOST + f'{uuid}/', data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
     def delete_image(uuid: str) -> Tuple[Dict, int]:
         response = Requester.perform_delete_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
@@ -177,6 +191,13 @@ class Requester:
     @staticmethod
     def post_audio(data: dict) -> Tuple[Dict, int]:
         response = Requester.perform_post_request(url=Requester.AUDIOS_HOST, data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
+    def patch_audio(uuid: str, data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_patch_request(url=Requester.AUDIOS_HOST + f'{uuid}/', data=data)
         if response is None:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code
@@ -253,7 +274,7 @@ class Requester:
         return ans, 200
 
     @staticmethod
-    def post_message(data: dict) -> Tuple[Dict, int]:
+    def post_message(token: str, data: dict) -> Tuple[Dict, int]:
         # Есть ли такая картинка
         if data['image_uuid']:
             resp_json, code = Requester.get_concrete_image(data['image_uuid'])
@@ -264,8 +285,35 @@ class Requester:
             resp_json, code = Requester.get_concrete_audio(data['audio_uuid'])
             if code != 200:
                 return resp_json, code
+        # Есть ли такие юзеры
+        if data['from_user_id']:
+            resp_json, code = Requester.get_concrete_user(token, data['from_user_id'])
+            if code != 200:
+                return resp_json, code
+        if data['to_user_id']:
+            resp_json, code = Requester.get_concrete_user(token, data['to_user_id'])
+            if code != 200:
+                return resp_json, code
         # POST
         response = Requester.perform_post_request(url=Requester.MESSAGES_HOST, data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
+    def patch_message(uuid: str, data: dict) -> Tuple[Dict, int]:
+        # Проверяем есть ли картинка
+        if data['image_uuid']:
+            resp_json, code = Requester.get_concrete_image(data['image_uuid'])
+            if code != 200:
+                return resp_json, code
+        # Проверяем есть ли аудио
+        if data['audio_uuid']:
+            resp_json, code = Requester.get_concrete_audio(data['audio_uuid'])
+            if code != 200:
+                return resp_json, code
+        # PATCH
+        response = Requester.perform_patch_request(Requester.MESSAGES_HOST + f'{uuid}/', data=data)
         if response is None:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code

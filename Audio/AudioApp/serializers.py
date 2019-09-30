@@ -17,3 +17,9 @@ class AudioSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         new = Audio.objects.create(**validated_data)
         return new
+
+    def update(self, instance: Audio, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.length = validated_data.get('length', instance.length)
+        instance.save()
+        return instance
