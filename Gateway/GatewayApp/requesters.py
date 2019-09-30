@@ -153,6 +153,13 @@ class Requester:
         return response.json(), response.status_code
 
     @staticmethod
+    def patch_image(uuid: str, data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_patch_request(url=Requester.IMAGES_HOST + f'{uuid}/', data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
     def delete_image(uuid: str) -> Tuple[Dict, int]:
         response = Requester.perform_delete_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
@@ -184,6 +191,13 @@ class Requester:
     @staticmethod
     def post_audio(data: dict) -> Tuple[Dict, int]:
         response = Requester.perform_post_request(url=Requester.AUDIOS_HOST, data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
+    def patch_audio(uuid: str, data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_patch_request(url=Requester.AUDIOS_HOST + f'{uuid}/', data=data)
         if response is None:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code
