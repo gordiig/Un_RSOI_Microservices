@@ -93,7 +93,7 @@ class Requester:
 
     @staticmethod
     def register(data: dict) -> Tuple[Dict, int]:
-        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'register/', data=data)
+        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'users/', data=data)
         return response.json(), response.status_code
 
     @staticmethod
