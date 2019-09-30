@@ -34,6 +34,14 @@ class GetUserInfoView(APIView):
         response_json, code = Requester.get_user_info(token)
         return Response(response_json, status=code)
 
+    def delete(self, request: Request):
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        response_json, code = Requester.delete_user(token)
+        return Response(response_json, status=code)
+
 
 # MARK: - Аудио
 class AudiosView(APIView):
@@ -58,6 +66,10 @@ class ConcreteAudioView(APIView):
 
     def get(self, request: Request, audio_uuid):
         data, code = Requester.get_concrete_audio(str(audio_uuid))
+        return Response(data, status=code)
+
+    def delete(self, request: Request, audio_uuid):
+        data, code = Requester.delete_audio(str(audio_uuid))
         return Response(data, status=code)
 
 
@@ -86,6 +98,10 @@ class ConcreteImageView(APIView):
         data, code = Requester.get_concrete_image(str(image_uuid))
         return Response(data, status=code)
 
+    def delete(self, request: Request, image_uuid):
+        data, code = Requester.delete_image(str(image_uuid))
+        return Response(data, status=code)
+
 
 # MARK: - Сообщения
 class MessagesView(APIView):
@@ -112,4 +128,8 @@ class ConcreteMessageView(APIView):
 
     def get(self, request: Request, message_uuid):
         data, code = Requester.get_concrete_message(str(message_uuid))
+        return Response(data, status=code)
+
+    def delete(self, request: Request, message_uuid):
+        data, code = Requester.delete_message(str(message_uuid))
         return Response(data, status=code)

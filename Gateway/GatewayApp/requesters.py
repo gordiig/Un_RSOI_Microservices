@@ -46,6 +46,22 @@ class Requester:
         return response
 
     @staticmethod
+    def perform_delete_request(url: str, headers: dict={}) -> Union[requests.Response, None]:
+        try:
+            response = requests.delete(url=url, headers=headers)
+        except requests.exceptions.BaseHTTPError:
+            return None
+        return response
+
+    @staticmethod
+    def perform_patch_request(url: str, data: dict={}, headers: dict = {}) -> Union[requests.Response, None]:
+        try:
+            response = requests.patch(url=url, json=data, headers=headers)
+        except requests.exceptions.BaseHTTPError:
+            return None
+        return response
+
+    @staticmethod
     def __find_limit_and_offset_in_link(link: str) -> (int, int):
         limit_substr = re.findall(r'limit=\d+', link)
         offset_substr = re.findall(r'offset=\d+', link)
@@ -87,6 +103,22 @@ class Requester:
         })
         return response.json(), response.status_code
 
+    @staticmethod
+    def delete_user(token: str) -> Tuple[Dict, int]:
+        user_json, code = Requester.get_user_info(token)
+        if code != 200:
+            return user_json, code
+        user_id = user_json['id']
+        users_msgs, code = Requester.get_messages(user_id)
+        if code != 200:
+            return users_msgs, code
+        for msg in users_msgs:
+            Requester.delete_message(msg['uuid'])
+        response = Requester.perform_delete_request(url=Requester.AUTH_HOST + 'user_info/', headers={
+            'Authorization': f'Token {token}',
+        })
+        return response.json(), response.status_code
+
     # MARK: - Images
     @staticmethod
     def get_images(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:
@@ -102,6 +134,13 @@ class Requester:
     @staticmethod
     def get_concrete_image(uuid: str) -> Tuple[Dict, int]:
         response = Requester.perform_get_request(Requester.IMAGES_HOST + f'{uuid}/')
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
+    def delete_image(uuid: str) -> Tuple[Dict, int]:
+        response = Requester.perform_delete_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code
@@ -127,6 +166,13 @@ class Requester:
             return response.json(), response.status_code
         except json.JSONDecodeError:
             return response.text, response.status_code
+
+    @staticmethod
+    def delete_audio(uuid: str) -> Tuple[Dict, int]:
+        response = Requester.perform_delete_request(Requester.AUDIOS_HOST + f'{uuid}/')
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
 
     # MARK: - Messages
     @staticmethod
@@ -191,3 +237,33 @@ class Requester:
         except (ImageGetError, AudioGetError) as e:
             return e.err_msg, e.code
         return ans, 200
+
+    @staticmethod
+    def delete_message(uuid: str) -> Tuple[Dict, int]:
+        errors = []
+        message_json, status = Requester.get_concrete_message(uuid)
+        if status != 200:
+            return message_json, status
+        if message_json['image_uuid']:
+            resp_json, status = Requester.delete_image(message_json['image_uuid'])
+            if status != 204:
+                errors.append({
+                    'image': message_json["image_uuid"],
+                    'code': status,
+                    'response': resp_json,
+                })
+        if message_json['audio_uuid']:
+            resp_json, status = Requester.delete_audio(message_json['audio_uuid'])
+            if status != 204:
+                errors.append({
+                    'audio': message_json["audio_uuid"],
+                    'code': status,
+                    'response': resp_json,
+                })
+        response = Requester.perform_delete_request(Requester.MESSAGES_HOST + f'{uuid}/')
+        if response is None:
+            return Requester.ERROR_RETURN
+        ans_json = response.json()
+        if len(errors) != 0:
+            ans_json['errors'] = errors
+        return ans_json, response.status_code

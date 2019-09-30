@@ -16,6 +16,12 @@ class UserInfoGetterView(APIView):
         serializer = UserSerializer(instance=request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def delete(self, request: Request):
+        if request.user is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        request.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class RegisterView(APIView):
     """
