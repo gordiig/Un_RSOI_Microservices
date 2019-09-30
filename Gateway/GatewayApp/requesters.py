@@ -158,7 +158,7 @@ class Requester:
     @staticmethod
     def __get_and_set_message_attachments(message: Dict) -> Dict:
         message = Requester.__get_and_set_message_audio(message)
-        message = Requester.__get_and_set_message_audio(message)
+        message = Requester.__get_and_set_message_image(message)
         return message
 
     @staticmethod
