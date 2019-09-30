@@ -46,19 +46,27 @@ class Requester:
         return response
 
     @staticmethod
+    def __find_limit_and_offset_in_link(link: str) -> (int, int):
+        limit_substr = re.findall(r'limit=\d+', link)
+        offset_substr = re.findall(r'offset=\d+', link)
+        limit = re.findall(r'\d+', limit_substr[0])
+        offset = [0]
+        if len(offset_substr) != 0:
+            offset = re.findall(r'\d+', offset_substr[0])
+        return limit[0], offset[0]
+
+    @staticmethod
     def __next_and_prev_links_to_params__(data: dict) -> dict:
         try:
             next_link, prev_link = data['next'], data['previous']
         except (KeyError, TypeError):
             return data
         if next_link:
-            substr = re.findall(r'^limit=\d+&offset=\d+', next_link)
-            l_o = re.findall(r'\d+', substr[0])
-            data['next'] = f'?limit={l_o[0]}&offset={l_o[1]}'
+            limit, offset = Requester.__find_limit_and_offset_in_link(next_link)
+            data['next'] = f'?limit={limit}&offset={offset}'
         if prev_link:
-            substr = re.findall(r'^limit=\d+&offset=\d+', prev_link)
-            l_o = re.findall(r'\d+', substr[0])
-            data['previous'] = f'?limit={l_o[0]}&offset={l_o[1]}'
+            limit, offset = Requester.__find_limit_and_offset_in_link(prev_link)
+            data['previous'] = f'?limit={limit}&offset={offset}'
         return data
 
     # MARK: - Auth
