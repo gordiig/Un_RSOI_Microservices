@@ -1,5 +1,6 @@
 import requests
 import json
+import re
 from typing import Tuple, Dict, List, Union, Any
 
 
@@ -43,6 +44,22 @@ class Requester:
         except requests.exceptions.BaseHTTPError:
             return None
         return response
+
+    @staticmethod
+    def __next_and_prev_links_to_params__(data: dict) -> dict:
+        try:
+            next_link, prev_link = data['next'], data['previous']
+        except KeyError:
+            return data
+        if next_link:
+            substr = re.findall(r'^limit=\d+&offset=\d+', next_link)
+            l_o = re.findall(r'\d+', substr[0])
+            data['next'] = f'?limit={l_o[0]}&offset={l_o[1]}'
+        if prev_link:
+            substr = re.findall(r'^limit=\d+&offset=\d+', prev_link)
+            l_o = re.findall(r'\d+', substr[0])
+            data['previous'] = f'?limit={l_o[0]}&offset={l_o[1]}'
+        return data
 
     # MARK: - Auth
     @staticmethod
