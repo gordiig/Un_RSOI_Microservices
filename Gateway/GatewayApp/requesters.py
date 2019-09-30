@@ -127,7 +127,7 @@ class Requester:
 
     @staticmethod
     def get_concrete_user(token: str, user_id: str) -> Tuple[Dict, int]:
-        response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'users/{user_id}', headers={
+        response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'users/{user_id}/', headers={
             'Authorization': f'Token {token}',
         })
         try:
