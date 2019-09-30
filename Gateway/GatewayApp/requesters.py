@@ -301,6 +301,24 @@ class Requester:
         return response.json(), response.status_code
 
     @staticmethod
+    def patch_message(uuid: str, data: dict) -> Tuple[Dict, int]:
+        # Проверяем есть ли картинка
+        if data['image_uuid']:
+            resp_json, code = Requester.get_concrete_image(data['image_uuid'])
+            if code != 200:
+                return resp_json, code
+        # Проверяем есть ли аудио
+        if data['audio_uuid']:
+            resp_json, code = Requester.get_concrete_audio(data['audio_uuid'])
+            if code != 200:
+                return resp_json, code
+        # PATCH
+        response = Requester.perform_patch_request(Requester.MESSAGES_HOST + f'{uuid}/', data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
     def delete_message(uuid: str) -> Tuple[Dict, int]:
         errors = []
         message_json, status = Requester.get_concrete_message(uuid)
