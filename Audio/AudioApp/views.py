@@ -27,6 +27,17 @@ class ConcreteAudioView(APIView):
         serializer = AudioSerializer(instance=audio)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request: Request, audio_uuid):
+        try:
+            audio = Audio.objects.get(pk=audio_uuid)
+        except Audio.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = AudioSerializer(instance=audio, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request: Request, audio_uuid):
         try:
             audio = Audio.objects.get(pk=audio_uuid)

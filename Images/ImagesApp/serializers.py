@@ -24,3 +24,10 @@ class ImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         new_image = Image.objects.create(**validated_data)
         return new_image
+
+    def update(self, instance: Image, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.width = validated_data.get('width', instance.width)
+        instance.height = validated_data.get('height', instance.height)
+        instance.save()
+        return instance

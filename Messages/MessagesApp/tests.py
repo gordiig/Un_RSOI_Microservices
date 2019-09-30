@@ -23,7 +23,9 @@ class AllMessagesTestCase(BaseTestCase):
         self.url_200 = self.url_prefix + f'messages/?user_id={self.message1.to_user_id}'
 
     def testGet404(self):
-        _ = self.get_response_and_check_status(url=self.url_404, expected_status_code=404)
+        msgs = self.get_response_and_check_status(url=self.url_404, expected_status_code=200)
+        self.assertEqual(len(msgs), 0)
+
 
     def testGet200(self):
         response = self.get_response_and_check_status(url=self.url_200)

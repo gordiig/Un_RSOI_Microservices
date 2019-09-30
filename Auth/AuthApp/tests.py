@@ -4,7 +4,7 @@ from TestUtils.models import BaseTestCase
 class RegisterTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
-        self.url = self.url_prefix + 'register/'
+        self.url = self.url_prefix + 'users/'
         self.data_201 = {
             'username': 'test',
             'password': 'test',
