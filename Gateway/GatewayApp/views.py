@@ -43,7 +43,10 @@ class AudiosView(APIView):
     permission_classes = (IsAuthenticatedThroughAuthService, )
 
     def get(self, request: Request):
-        data, code = Requester.get_audios()
+        limit_offset = request.query_params.get('limit'), request.query_params.get('offset')
+        if limit_offset[0] is None or limit_offset[1] is None:
+            limit_offset = None
+        data, code = Requester.get_audios(limit_and_offset=limit_offset)
         return Response(data, status=code)
 
 
@@ -66,7 +69,10 @@ class ImagesView(APIView):
     permission_classes = (IsAuthenticatedThroughAuthService, )
 
     def get(self, request: Request):
-        data, code = Requester.get_images()
+        limit_offset = request.query_params.get('limit'), request.query_params.get('offset')
+        if limit_offset[0] is None or limit_offset[1] is None:
+            limit_offset = None
+        data, code = Requester.get_images(limit_and_offset=limit_offset)
         return Response(data, status=code)
 
 
@@ -91,7 +97,10 @@ class MessagesView(APIView):
     def get(self, request: Request):
         if 'user_id' not in request.query_params.keys():
             return Response({'error': 'No user_id in query params'}, status=400)
-        data, code = Requester.get_messages(user_id=request.query_params['user_id'])
+        limit_offset = request.query_params.get('limit'), request.query_params.get('offset')
+        if limit_offset[0] is None or limit_offset[1] is None:
+            limit_offset = None
+        data, code = Requester.get_messages(user_id=request.query_params['user_id'], limit_and_offset=limit_offset)
         return Response(data, status=code)
 
 
