@@ -46,20 +46,13 @@ class Requester:
 
     # MARK: - Auth
     @staticmethod
-    def authenticate(username: str, password: str) -> Union[str, Tuple[Dict, int]]:
-        response = Requester.perform_post_request(Requester.AUTH_HOST + 'token-auth/', data={
-            'username': username,
-            'password': password,
-        })
+    def authenticate(data: dict) -> Union[str, Tuple[Dict, int]]:
+        response = Requester.perform_post_request(Requester.AUTH_HOST + 'token-auth/', data=data)
         return response.json(), response.status_code
 
     @staticmethod
-    def register(username: str, email: str, password: str) -> Tuple[Dict, int]:
-        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'register/', data={
-            'username': username,
-            'password': password,
-            'email': email,
-        })
+    def register(data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'register/', data=data)
         return response.json(), response.status_code
 
     @staticmethod

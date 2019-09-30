@@ -9,10 +9,7 @@ class AuthView(APIView):
     Получение токена по юзернейму и паролю
     """
     def post(self, request: Request):
-        if len({'username', 'password'}.intersection(list(request.data.keys()))) != 2:
-            return Response({'error': 'Body must have username and password fields'}, status=400)
-        response_json, code = Requester.authenticate(username=request.data['username'],
-                                                     password=request.data['password'])
+        response_json, code = Requester.authenticate(data=request.data)
         return Response(response_json, status=code)
 
 
@@ -21,11 +18,7 @@ class RegisterView(APIView):
     Регистрация
     """
     def post(self, request: Request):
-        needed_data = {'username', 'password', 'email'}.intersection(list(request.data.keys()))
-        if len(needed_data) != 3:
-            return Response({'error': 'Body must have username, email and password fields'}, status=400)
-        response_json, code = Requester.register(username=request.data['username'], password=request.data['password'],
-                                                 email=request.data['email'])
+        response_json, code = Requester.register(data=request.data)
         return Response(data=response_json, status=code)
 
 
