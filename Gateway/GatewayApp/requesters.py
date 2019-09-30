@@ -64,8 +64,11 @@ class Requester:
 
     # MARK: - Images
     @staticmethod
-    def get_images() -> Tuple[List, int]:
-        response = Requester.perform_get_request(Requester.IMAGES_HOST)
+    def get_images(limit_and_offset: (int, int) = None) -> Tuple[List, int]:
+        host = Requester.IMAGES_HOST
+        if limit_and_offset is not None:
+            host += f'?limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
+        response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code
@@ -79,8 +82,11 @@ class Requester:
 
     # MARK: - Audio
     @staticmethod
-    def get_audios() -> Tuple[List, int]:
-        response = Requester.perform_get_request(Requester.AUDIOS_HOST)
+    def get_audios(limit_and_offset: (int, int) = None) -> Tuple[List, int]:
+        host = Requester.AUDIOS_HOST
+        if limit_and_offset is not None:
+            host += f'?limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
+        response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code
@@ -129,9 +135,12 @@ class Requester:
         return message
 
     @staticmethod
-    def get_messages(user_id: int) -> Tuple[Union[List, Dict], int]:
+    def get_messages(user_id: int, limit_and_offset: (int, int) = None) -> Tuple[Union[List, Dict], int]:
         # Получаем сообщения
-        response = Requester.perform_get_request(Requester.MESSAGES_HOST + f'?user_id={user_id}')
+        host = Requester.MESSAGES_HOST + f'?user_id={user_id}'
+        if limit_and_offset is not None:
+            host += f'&limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
+        response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
