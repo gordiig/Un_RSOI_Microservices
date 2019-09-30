@@ -18,8 +18,12 @@ class AllMessagesView(APIView):
         msgs = Message.objects.filter(Q(from_user_id=user_id) | Q(to_user_id=user_id))
         if len(msgs) == 0:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        paginator = LimitOffsetPagination()
-        results = paginator.paginate_queryset(msgs, request)
+        try:
+            _ = request.query_params['limit']
+            paginator = LimitOffsetPagination()
+            results = paginator.paginate_queryset(msgs, request)
+        except KeyError:
+            results = msgs
         serializer = MessageSerializer(instance=results, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
