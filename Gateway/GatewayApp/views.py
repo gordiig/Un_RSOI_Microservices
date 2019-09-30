@@ -160,7 +160,11 @@ class ConcreteMessageView(APIView):
         return Response(data, status=code)
 
     def patch(self, request: Request, message_uuid):
-        data, code = Requester.patch_message(str(message_uuid), request.data)
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        data, code = Requester.patch_message(token, str(message_uuid), request.data)
         return Response(data, status=code)
 
     def delete(self, request: Request, message_uuid):

@@ -89,26 +89,38 @@ class Requester:
     @staticmethod
     def authenticate(data: dict) -> Union[str, Tuple[Dict, int]]:
         response = Requester.perform_post_request(Requester.AUTH_HOST + 'token-auth/', data=data)
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     @staticmethod
     def register(data: dict) -> Tuple[Dict, int]:
         response = Requester.perform_post_request(url=Requester.AUTH_HOST + 'users/', data=data)
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     @staticmethod
     def get_user_info(token: str) -> Tuple[Dict, int]:
         response = Requester.perform_get_request(url=Requester.AUTH_HOST + 'user_info/', headers={
             'Authorization': f'Token {token}',
         })
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     @staticmethod
     def get_concrete_user(token: str, user_id: str) -> Tuple[Dict, int]:
-        response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'user/{user_id}', headers={
+        response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'users/{user_id}', headers={
             'Authorization': f'Token {token}',
         })
-        return response.json(), response.status_code
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
 
     @staticmethod
     def delete_user(token: str) -> Tuple[Dict, int]:
@@ -316,7 +328,7 @@ class Requester:
         return response.json(), response.status_code
 
     @staticmethod
-    def patch_message(uuid: str, data: dict) -> Tuple[Dict, int]:
+    def patch_message(token: str, uuid: str, data: dict) -> Tuple[Dict, int]:
         # Проверяем есть ли картинка
         if data['image_uuid']:
             resp_json, code = Requester.get_concrete_image(data['image_uuid'])
@@ -327,6 +339,11 @@ class Requester:
             resp_json, code = Requester.get_concrete_audio(data['audio_uuid'])
             if code != 200:
                 return resp_json, code
+        # Получение айдишника юзера, который пишет
+        user_json, code = Requester.get_user_info(token)
+        if code != 200:
+            return user_json, code
+        data['from_user_id'] = user_json['id']
         # PATCH
         response = Requester.perform_patch_request(Requester.MESSAGES_HOST + f'{uuid}/', data=data)
         if response is None:
