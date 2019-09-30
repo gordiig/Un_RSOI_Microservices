@@ -57,6 +57,10 @@ class AudiosView(APIView):
         data, code = Requester.get_audios(limit_and_offset=limit_offset)
         return Response(data, status=code)
 
+    def post(self, request: Request):
+        data, code = Requester.post_audio(request.data)
+        return Response(data, status=code)
+
 
 class ConcreteAudioView(APIView):
     """
@@ -85,6 +89,10 @@ class ImagesView(APIView):
         if limit_offset[0] is None or limit_offset[1] is None:
             limit_offset = None
         data, code = Requester.get_images(limit_and_offset=limit_offset)
+        return Response(data, status=code)
+
+    def post(self, request: Request):
+        data, code = Requester.post_image(request.data)
         return Response(data, status=code)
 
 
@@ -117,6 +125,10 @@ class MessagesView(APIView):
         if limit_offset[0] is None or limit_offset[1] is None:
             limit_offset = None
         data, code = Requester.get_messages(user_id=request.query_params['user_id'], limit_and_offset=limit_offset)
+        return Response(data, status=code)
+
+    def post(self, request: Request):
+        data, code = Requester.post_message(request.data)
         return Response(data, status=code)
 
 
