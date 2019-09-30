@@ -46,6 +46,22 @@ class Requester:
         return response
 
     @staticmethod
+    def perform_delete_request(url: str, headers: dict={}) -> Union[requests.Response, None]:
+        try:
+            response = requests.delete(url=url, headers=headers)
+        except requests.exceptions.BaseHTTPError:
+            return None
+        return response
+
+    @staticmethod
+    def perform_patch_request(url: str, data: dict={}, headers: dict = {}) -> Union[requests.Response, None]:
+        try:
+            response = requests.patch(url=url, json=data, headers=headers)
+        except requests.exceptions.BaseHTTPError:
+            return None
+        return response
+
+    @staticmethod
     def __find_limit_and_offset_in_link(link: str) -> (int, int):
         limit_substr = re.findall(r'limit=\d+', link)
         offset_substr = re.findall(r'offset=\d+', link)
