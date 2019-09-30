@@ -81,14 +81,15 @@ class Requester:
 
     # MARK: - Images
     @staticmethod
-    def get_images(limit_and_offset: (int, int) = None) -> Tuple[List, int]:
+    def get_images(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:
         host = Requester.IMAGES_HOST
         if limit_and_offset is not None:
             host += f'?limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
         response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        response_json = Requester.__next_and_prev_links_to_params__(response.json())
+        return response_json, response.status_code
 
     @staticmethod
     def get_concrete_image(uuid: str) -> Tuple[Dict, int]:
@@ -99,14 +100,15 @@ class Requester:
 
     # MARK: - Audio
     @staticmethod
-    def get_audios(limit_and_offset: (int, int) = None) -> Tuple[List, int]:
+    def get_audios(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:
         host = Requester.AUDIOS_HOST
         if limit_and_offset is not None:
             host += f'?limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
         response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        response_json = Requester.__next_and_prev_links_to_params__(response.json())
+        return response_json, response.status_code
 
     @staticmethod
     def get_concrete_audio(uuid: str) -> Tuple[Dict, int]:
@@ -162,10 +164,14 @@ class Requester:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
             return response.json(), response.status_code
-        response_json = response.json()
+        response_json = Requester.__next_and_prev_links_to_params__(response.json())
+        if limit_and_offset is not None:
+            to_iterate = response_json['results']
+        else:
+            to_iterate = response_json
         ans = []
         # Прикрепляем картинку и аудио
-        for msg in response_json:
+        for msg in to_iterate:
             try:
                 ans.append(Requester.__get_and_set_message_attachments(msg))
             except KeyError:
@@ -173,6 +179,9 @@ class Requester:
                         500)
             except (ImageGetError, AudioGetError) as e:
                 return e.err_msg, e.code
+        if limit_and_offset is not None:
+            response_json['results'] = ans
+            return response_json, 200
         return ans, 200
 
     @staticmethod
