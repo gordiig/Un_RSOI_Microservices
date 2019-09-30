@@ -1,5 +1,6 @@
 import requests
 import json
+import re
 from typing import Tuple, Dict, List, Union, Any
 
 
@@ -44,6 +45,30 @@ class Requester:
             return None
         return response
 
+    @staticmethod
+    def __find_limit_and_offset_in_link(link: str) -> (int, int):
+        limit_substr = re.findall(r'limit=\d+', link)
+        offset_substr = re.findall(r'offset=\d+', link)
+        limit = re.findall(r'\d+', limit_substr[0])
+        offset = [0]
+        if len(offset_substr) != 0:
+            offset = re.findall(r'\d+', offset_substr[0])
+        return limit[0], offset[0]
+
+    @staticmethod
+    def __next_and_prev_links_to_params__(data: dict) -> dict:
+        try:
+            next_link, prev_link = data['next'], data['previous']
+        except (KeyError, TypeError):
+            return data
+        if next_link:
+            limit, offset = Requester.__find_limit_and_offset_in_link(next_link)
+            data['next'] = f'?limit={limit}&offset={offset}'
+        if prev_link:
+            limit, offset = Requester.__find_limit_and_offset_in_link(prev_link)
+            data['previous'] = f'?limit={limit}&offset={offset}'
+        return data
+
     # MARK: - Auth
     @staticmethod
     def authenticate(data: dict) -> Union[str, Tuple[Dict, int]]:
@@ -64,11 +89,15 @@ class Requester:
 
     # MARK: - Images
     @staticmethod
-    def get_images() -> Tuple[List, int]:
-        response = Requester.perform_get_request(Requester.IMAGES_HOST)
+    def get_images(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:
+        host = Requester.IMAGES_HOST
+        if limit_and_offset is not None:
+            host += f'?limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
+        response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        response_json = Requester.__next_and_prev_links_to_params__(response.json())
+        return response_json, response.status_code
 
     @staticmethod
     def get_concrete_image(uuid: str) -> Tuple[Dict, int]:
@@ -79,11 +108,15 @@ class Requester:
 
     # MARK: - Audio
     @staticmethod
-    def get_audios() -> Tuple[List, int]:
-        response = Requester.perform_get_request(Requester.AUDIOS_HOST)
+    def get_audios(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:
+        host = Requester.AUDIOS_HOST
+        if limit_and_offset is not None:
+            host += f'?limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
+        response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
-        return response.json(), response.status_code
+        response_json = Requester.__next_and_prev_links_to_params__(response.json())
+        return response_json, response.status_code
 
     @staticmethod
     def get_concrete_audio(uuid: str) -> Tuple[Dict, int]:
@@ -129,25 +162,18 @@ class Requester:
         return message
 
     @staticmethod
-    def get_messages(user_id: int) -> Tuple[Union[List, Dict], int]:
+    def get_messages(user_id: int, limit_and_offset: (int, int) = None) -> Tuple[Union[List, Dict], int]:
         # Получаем сообщения
-        response = Requester.perform_get_request(Requester.MESSAGES_HOST + f'?user_id={user_id}')
+        host = Requester.MESSAGES_HOST + f'?user_id={user_id}'
+        if limit_and_offset is not None:
+            host += f'&limit={limit_and_offset[0]}&offset={limit_and_offset[1]}'
+        response = Requester.perform_get_request(host)
         if response is None:
             return Requester.ERROR_RETURN
         if response.status_code != 200:
             return response.json(), response.status_code
-        response_json = response.json()
-        ans = []
-        # Прикрепляем картинку и аудио
-        for msg in response_json:
-            try:
-                ans.append(Requester.__get_and_set_message_attachments(msg))
-            except KeyError:
-                return (Requester.__create_error_message('Key error was raised, no image or audio uuid in message json!'),
-                        500)
-            except (ImageGetError, AudioGetError) as e:
-                return e.err_msg, e.code
-        return ans, 200
+        response_json = Requester.__next_and_prev_links_to_params__(response.json())
+        return response_json, 200
 
     @staticmethod
     def get_concrete_message(uuid: str) -> Tuple[Dict, int]:
