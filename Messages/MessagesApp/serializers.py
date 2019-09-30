@@ -22,8 +22,6 @@ class MessageSerializer(serializers.ModelSerializer):
         return new
 
     def update(self, instance: Message, validated_data):
-        instance.from_user_id = validated_data.get('from_user_id', instance.from_user_id)
-        instance.to_user_id = validated_data.get('to_user_id', instance.to_user_id)
         instance.text = validated_data.get('text', instance.text)
         instance.image_uuid = validated_data.get('image_uuid', instance.image_uuid)
         instance.audio_uuid = validated_data.get('audio_uuid', instance.audio_uuid)
