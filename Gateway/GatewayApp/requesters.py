@@ -260,7 +260,7 @@ class Requester:
         return ans, 200
 
     @staticmethod
-    def post_message(data: dict) -> Tuple[Dict, int]:
+    def post_message(token: str, data: dict) -> Tuple[Dict, int]:
         # Есть ли такая картинка
         if data['image_uuid']:
             resp_json, code = Requester.get_concrete_image(data['image_uuid'])
@@ -273,7 +273,13 @@ class Requester:
                 return resp_json, code
         # Есть ли такие юзеры
         if data['from_user_id']:
-            pass
+            resp_json, code = Requester.get_concrete_user(token, data['from_user_id'])
+            if code != 200:
+                return resp_json, code
+        if data['to_user_id']:
+            resp_json, code = Requester.get_concrete_user(token, data['to_user_id'])
+            if code != 200:
+                return resp_json, code
         # POST
         response = Requester.perform_post_request(url=Requester.MESSAGES_HOST, data=data)
         if response is None:
