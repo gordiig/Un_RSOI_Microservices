@@ -60,6 +60,10 @@ class ConcreteAudioView(APIView):
         data, code = Requester.get_concrete_audio(str(audio_uuid))
         return Response(data, status=code)
 
+    def delete(self, request: Request, audio_uuid):
+        data, code = Requester.delete_audio(str(audio_uuid))
+        return Response(data, status=code)
+
 
 # MARK: - Картинки
 class ImagesView(APIView):
@@ -84,6 +88,10 @@ class ConcreteImageView(APIView):
 
     def get(self, request: Request, image_uuid):
         data, code = Requester.get_concrete_image(str(image_uuid))
+        return Response(data, status=code)
+
+    def delete(self, request: Request, image_uuid):
+        data, code = Requester.delete_image(str(image_uuid))
         return Response(data, status=code)
 
 
@@ -112,4 +120,8 @@ class ConcreteMessageView(APIView):
 
     def get(self, request: Request, message_uuid):
         data, code = Requester.get_concrete_message(str(message_uuid))
+        return Response(data, status=code)
+
+    def delete(self, request: Request, message_uuid):
+        data, code = Requester.delete_message(str(message_uuid))
         return Response(data, status=code)
