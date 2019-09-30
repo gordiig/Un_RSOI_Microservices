@@ -127,12 +127,16 @@ class MessagesView(APIView):
     permission_classes = (IsAuthenticatedThroughAuthService, )
 
     def get(self, request: Request):
-        if 'user_id' not in request.query_params.keys():
-            return Response({'error': 'No user_id in query params'}, status=400)
+        # Getting token
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        # Getting user_info by token
         limit_offset = request.query_params.get('limit'), request.query_params.get('offset')
         if limit_offset[0] is None or limit_offset[1] is None:
             limit_offset = None
-        data, code = Requester.get_messages(user_id=request.query_params['user_id'], limit_and_offset=limit_offset)
+        data, code = Requester.get_messages(token=token, limit_and_offset=limit_offset)
         return Response(data, status=code)
 
     def post(self, request: Request):

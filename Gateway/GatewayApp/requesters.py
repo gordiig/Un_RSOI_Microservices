@@ -252,7 +252,12 @@ class Requester:
         return message
 
     @staticmethod
-    def get_messages(user_id: int, limit_and_offset: (int, int) = None) -> Tuple[Union[List, Dict], int]:
+    def get_messages(token: str, limit_and_offset: (int, int) = None) -> Tuple[Union[List, Dict], int]:
+        # Получаем инфу о юзере по токену
+        user_json, code = Requester.get_user_info(token)
+        if code != 200:
+            return user_json, code
+        user_id = user_json['id']
         # Получаем сообщения
         host = Requester.MESSAGES_HOST + f'?user_id={user_id}'
         if limit_and_offset is not None:
