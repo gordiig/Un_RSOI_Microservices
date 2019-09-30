@@ -173,24 +173,7 @@ class Requester:
         if response.status_code != 200:
             return response.json(), response.status_code
         response_json = Requester.__next_and_prev_links_to_params__(response.json())
-        if limit_and_offset is not None:
-            to_iterate = response_json['results']
-        else:
-            to_iterate = response_json
-        ans = []
-        # Прикрепляем картинку и аудио
-        for msg in to_iterate:
-            try:
-                ans.append(Requester.__get_and_set_message_attachments(msg))
-            except KeyError:
-                return (Requester.__create_error_message('Key error was raised, no image or audio uuid in message json!'),
-                        500)
-            except (ImageGetError, AudioGetError) as e:
-                return e.err_msg, e.code
-        if limit_and_offset is not None:
-            response_json['results'] = ans
-            return response_json, 200
-        return ans, 200
+        return response_json, 200
 
     @staticmethod
     def get_concrete_message(uuid: str) -> Tuple[Dict, int]:

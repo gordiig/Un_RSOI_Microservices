@@ -110,6 +110,6 @@ class ConcreteMessageView(APIView):
     """
     permission_classes = (IsAuthenticatedThroughAuthService, )
 
-    def get(self, request: Request, image_uuid):
-        data, code = Requester.get_concrete_message(str(image_uuid))
+    def get(self, request: Request, message_uuid):
+        data, code = Requester.get_concrete_message(str(message_uuid))
         return Response(data, status=code)
