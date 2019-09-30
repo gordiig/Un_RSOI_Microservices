@@ -42,16 +42,16 @@ class UsersView(ListCreateAPIView):
         return User.objects.all()
 
 
-# class ConcreteUserView(APIView):
-#     permission_classes = (IsAuthenticated, )
-#
-#     def get(self, request: Request, user_id):
-#         try:
-#             person = User.objects.get(id=user_id)
-#         except User.DoesNotExist:
-#             return Response(status=status.HTTP_404_NOT_FOUND)
-#         serializer = UserSerializer(instance=person)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+class ConcreteUserView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request: Request, user_id):
+        try:
+            person = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = UserSerializer(instance=person)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # class RegisterView(APIView):
 #     """
