@@ -103,6 +103,22 @@ class Requester:
         })
         return response.json(), response.status_code
 
+    @staticmethod
+    def delete_user(token: str) -> Tuple[Dict, int]:
+        user_json, code = Requester.get_user_info(token)
+        if code != 200:
+            return user_json, code
+        user_id = user_json['id']
+        users_msgs, code = Requester.get_messages(user_id)
+        if code != 200:
+            return users_msgs, code
+        for msg in users_msgs:
+            Requester.delete_message(msg['uuid'])
+        response = Requester.perform_delete_request(url=Requester.AUTH_HOST + 'user_info/', headers={
+            'Authorization': f'Token {token}',
+        })
+        return response.json(), response.status_code
+
     # MARK: - Images
     @staticmethod
     def get_images(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:

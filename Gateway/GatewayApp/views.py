@@ -34,6 +34,14 @@ class GetUserInfoView(APIView):
         response_json, code = Requester.get_user_info(token)
         return Response(response_json, status=code)
 
+    def delete(self, request: Request):
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        response_json, code = Requester.delete_user(token)
+        return Response(response_json, status=code)
+
 
 # MARK: - Аудио
 class AudiosView(APIView):
