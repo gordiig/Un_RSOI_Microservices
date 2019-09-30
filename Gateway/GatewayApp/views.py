@@ -26,6 +26,8 @@ class GetUserInfoView(APIView):
     """
     Получение инфы о юзере по токену
     """
+    permission_classes = (IsAuthenticatedThroughAuthService,)
+
     def get(self, request: Request):
         token_str = request.META.get('HTTP_AUTHORIZATION')
         if token_str is None:
@@ -40,6 +42,39 @@ class GetUserInfoView(APIView):
             return Response({'error': 'No Authorization header!'}, status=400)
         token = token_str[6:]
         response_json, code = Requester.delete_user(token)
+        return Response(response_json, status=code)
+
+
+class UsersView(APIView):
+    """
+    Получение списка юзеров
+    """
+    permission_classes = (IsAuthenticatedThroughAuthService,)
+
+    def get(self, request: Request):
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        limit_offset = request.query_params.get('limit'), request.query_params.get('offset')
+        if limit_offset[0] is None or limit_offset[1] is None:
+            limit_offset = None
+        response_json, code = Requester.get_users(token, limit_offset)
+        return Response(response_json, status=code)
+
+
+class ConcreteUserView(APIView):
+    """
+    Получение конкретного пользователя
+    """
+    permission_classes = (IsAuthenticatedThroughAuthService,)
+
+    def get(self, request: Request, user_id):
+        token_str = request.META.get('HTTP_AUTHORIZATION')
+        if token_str is None:
+            return Response({'error': 'No Authorization header!'}, status=400)
+        token = token_str[6:]
+        response_json, code = Requester.get_concrete_user(token, user_id)
         return Response(response_json, status=code)
 
 

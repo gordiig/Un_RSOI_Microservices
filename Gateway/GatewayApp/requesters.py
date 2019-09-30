@@ -113,6 +113,19 @@ class Requester:
             return response.text, response.status_code
 
     @staticmethod
+    def get_users(token: str, limit_offset: (int, int) = None) -> Tuple[Dict, int]:
+        host = Requester.AUTH_HOST + 'users/'
+        if limit_offset:
+            host += f'?limit={limit_offset[0]}&offset={limit_offset[1]}'
+        response = Requester.perform_get_request(url=host, headers={
+            'Authorization': f'Token {token}',
+        })
+        try:
+            return response.json(), response.status_code
+        except json.JSONDecodeError:
+            return response.text, response.status_code
+
+    @staticmethod
     def get_concrete_user(token: str, user_id: str) -> Tuple[Dict, int]:
         response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'users/{user_id}', headers={
             'Authorization': f'Token {token}',
