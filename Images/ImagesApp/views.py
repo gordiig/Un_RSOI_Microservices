@@ -27,6 +27,17 @@ class ConcreteImageView(APIView):
         serializer = ImageSerializer(instance=img)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request: Request, image_uuid):
+        try:
+            img = Image.objects.get(pk=image_uuid)
+        except Image.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = ImageSerializer(instance=img, data=request.data)
+        if serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request: Request, image_uuid):
         try:
             img = Image.objects.get(pk=image_uuid)
