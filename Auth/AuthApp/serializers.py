@@ -24,3 +24,10 @@ class UserSerializer(serializers.ModelSerializer):
         new_user.set_password(password)
         new_user.save()
         return new_user
+
+    def update(self, instance: User, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        new_pass = validated_data['password']
+        instance.set_password(new_pass)
+        return instance
