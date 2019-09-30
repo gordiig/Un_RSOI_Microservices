@@ -122,6 +122,13 @@ class Requester:
             return Requester.ERROR_RETURN
         return response.json(), response.status_code
 
+    @staticmethod
+    def delete_image(uuid: str) -> Tuple[Dict, int]:
+        response = Requester.perform_delete_request(Requester.IMAGES_HOST + f'{uuid}/')
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
     # MARK: - Audio
     @staticmethod
     def get_audios(limit_and_offset: (int, int) = None) -> Tuple[Union[List, dict], int]:
@@ -143,6 +150,13 @@ class Requester:
             return response.json(), response.status_code
         except json.JSONDecodeError:
             return response.text, response.status_code
+
+    @staticmethod
+    def delete_audio(uuid: str) -> Tuple[Dict, int]:
+        response = Requester.perform_delete_request(Requester.AUDIOS_HOST + f'{uuid}/')
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
 
     # MARK: - Messages
     @staticmethod
@@ -207,3 +221,33 @@ class Requester:
         except (ImageGetError, AudioGetError) as e:
             return e.err_msg, e.code
         return ans, 200
+
+    @staticmethod
+    def delete_message(uuid: str) -> Tuple[Dict, int]:
+        errors = []
+        message_json, status = Requester.get_concrete_message(uuid)
+        if status != 200:
+            return message_json, status
+        if message_json['image_uuid']:
+            resp_json, status = Requester.delete_image(message_json['image_uuid'])
+            if status != 204:
+                errors.append({
+                    'image': message_json["image_uuid"],
+                    'code': status,
+                    'response': resp_json,
+                })
+        if message_json['audio_uuid']:
+            resp_json, status = Requester.delete_audio(message_json['audio_uuid'])
+            if status != 204:
+                errors.append({
+                    'audio': message_json["audio_uuid"],
+                    'code': status,
+                    'response': resp_json,
+                })
+        response = Requester.perform_delete_request(Requester.MESSAGES_HOST + f'{uuid}/')
+        if response is None:
+            return Requester.ERROR_RETURN
+        ans_json = response.json()
+        if len(errors) != 0:
+            ans_json['errors'] = errors
+        return ans_json, response.status_code
