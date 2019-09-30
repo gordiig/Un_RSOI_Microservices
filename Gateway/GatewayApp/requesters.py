@@ -104,6 +104,13 @@ class Requester:
         return response.json(), response.status_code
 
     @staticmethod
+    def get_concrete_user(token: str, user_id: str) -> Tuple[Dict, int]:
+        response = Requester.perform_get_request(url=Requester.AUTH_HOST + f'user/{user_id}', headers={
+            'Authorization': f'Token {token}',
+        })
+        return response.json(), response.status_code
+
+    @staticmethod
     def delete_user(token: str) -> Tuple[Dict, int]:
         user_json, code = Requester.get_user_info(token)
         if code != 200:
@@ -264,6 +271,9 @@ class Requester:
             resp_json, code = Requester.get_concrete_audio(data['audio_uuid'])
             if code != 200:
                 return resp_json, code
+        # Есть ли такие юзеры
+        if data['from_user_id']:
+            pass
         # POST
         response = Requester.perform_post_request(url=Requester.MESSAGES_HOST, data=data)
         if response is None:
