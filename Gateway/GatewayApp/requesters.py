@@ -139,6 +139,13 @@ class Requester:
         return response.json(), response.status_code
 
     @staticmethod
+    def post_image(data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_post_request(url=Requester.IMAGES_HOST, data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
+
+    @staticmethod
     def delete_image(uuid: str) -> Tuple[Dict, int]:
         response = Requester.perform_delete_request(Requester.IMAGES_HOST + f'{uuid}/')
         if response is None:
@@ -166,6 +173,13 @@ class Requester:
             return response.json(), response.status_code
         except json.JSONDecodeError:
             return response.text, response.status_code
+
+    @staticmethod
+    def post_audio(data: dict) -> Tuple[Dict, int]:
+        response = Requester.perform_post_request(url=Requester.AUDIOS_HOST, data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
 
     @staticmethod
     def delete_audio(uuid: str) -> Tuple[Dict, int]:
@@ -237,6 +251,24 @@ class Requester:
         except (ImageGetError, AudioGetError) as e:
             return e.err_msg, e.code
         return ans, 200
+
+    @staticmethod
+    def post_message(data: dict) -> Tuple[Dict, int]:
+        # Есть ли такая картинка
+        if data['image_uuid']:
+            resp_json, code = Requester.get_concrete_image(data['image_uuid'])
+            if code != 200:
+                return resp_json, code
+        # Есть ли такое аудио
+        if data['audio_uuid']:
+            resp_json, code = Requester.get_concrete_audio(data['audio_uuid'])
+            if code != 200:
+                return resp_json, code
+        # POST
+        response = Requester.perform_post_request(url=Requester.MESSAGES_HOST, data=data)
+        if response is None:
+            return Requester.ERROR_RETURN
+        return response.json(), response.status_code
 
     @staticmethod
     def delete_message(uuid: str) -> Tuple[Dict, int]:
