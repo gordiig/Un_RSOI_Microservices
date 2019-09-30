@@ -300,14 +300,15 @@ class Requester:
             if code != 200:
                 return resp_json, code
         # Есть ли такие юзеры
-        if data['from_user_id']:
-            resp_json, code = Requester.get_concrete_user(token, data['from_user_id'])
-            if code != 200:
-                return resp_json, code
         if data['to_user_id']:
             resp_json, code = Requester.get_concrete_user(token, data['to_user_id'])
             if code != 200:
                 return resp_json, code
+        # Получение айдишника юзера, который пишет
+        user_json, code = Requester.get_user_info(token)
+        if code != 200:
+            return user_json, code
+        data['from_user_id'] = user_json['id']
         # POST
         response = Requester.perform_post_request(url=Requester.MESSAGES_HOST, data=data)
         if response is None:

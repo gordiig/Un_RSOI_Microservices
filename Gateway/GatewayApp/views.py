@@ -132,10 +132,11 @@ class MessagesView(APIView):
         if token_str is None:
             return Response({'error': 'No Authorization header!'}, status=400)
         token = token_str[6:]
-        # Getting user_info by token
+        # Getting limit/offset
         limit_offset = request.query_params.get('limit'), request.query_params.get('offset')
         if limit_offset[0] is None or limit_offset[1] is None:
             limit_offset = None
+        # Getting messages
         data, code = Requester.get_messages(token=token, limit_and_offset=limit_offset)
         return Response(data, status=code)
 
