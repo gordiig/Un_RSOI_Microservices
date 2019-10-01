@@ -67,7 +67,7 @@ class MessagesRequester(Requester):
         if response is None:
             return self.ERROR_RETURN
         if response.status_code != 200:
-            return response.json(), response.status_code
+            return self.get_valid_json_from_response(response), response.status_code
         valid_json = self.get_valid_json_from_response(response)
         try:
             ans = self.__get_and_set_message_attachments(valid_json)
