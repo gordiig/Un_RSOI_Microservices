@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Tuple
 from GatewayApp.requesters.requester import Requester
 
 
