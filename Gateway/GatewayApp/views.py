@@ -1,8 +1,8 @@
 from rest_framework.views import Response, Request, APIView
-from GatewayApp.requesters.auth_requester import AuthRequester
 from GatewayApp.requesters.messages_requester import MessagesRequester
 from GatewayApp.requesters.images_requester import ImagesRequester
 from GatewayApp.requesters.audio_requester import AudioRequester
+from GatewayApp.requesters.auth_requester import AuthRequester
 from GatewayApp.permissions import IsAuthenticatedThroughAuthService
 
 
