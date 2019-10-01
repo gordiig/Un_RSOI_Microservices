@@ -155,7 +155,7 @@ class MessagesRequester(Requester):
     def _delete_audio_from_message(self, request, message_json: dict) -> Tuple[dict, int]:
         from GatewayApp.requesters.audio_requester import AudioRequester
         if message_json['audio_uuid']:
-            del_json, code = AudioRequester().delete_audio(request, message_json['image_uuid'])
+            del_json, code = AudioRequester().delete_audio(request, message_json['audio_uuid'])
             if code not in (204, 404):
                 return del_json, code
         return {}, 204

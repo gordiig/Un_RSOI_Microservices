@@ -17,7 +17,7 @@ class ImagesRequester(Requester):
         return response_json, response.status_code
 
     def get_concrete_image(self, request, uuid: str) -> Tuple[dict, int]:
-        response = self.perform_get_request(self.HOST + uuid + '/')
+        response = self.perform_get_request(self.HOST + f'{uuid}/')
         if response is None:
             return self.ERROR_RETURN
         return self.get_valid_json_from_response(response), response.status_code
@@ -29,13 +29,13 @@ class ImagesRequester(Requester):
         return self.get_valid_json_from_response(response), response.status_code
 
     def patch_image(self, request, uuid: str, data: dict) -> Tuple[dict, int]:
-        response = self.perform_patch_request(self.HOST + uuid + '/', data=data)
+        response = self.perform_patch_request(self.HOST + f'{uuid}/', data=data)
         if response is None:
             return self.ERROR_RETURN
         return self.get_valid_json_from_response(response), response.status_code
 
     def delete_image(self, request, uuid: str) -> Tuple[dict, int]:
-        response = self.perform_delete_request(self.HOST + uuid + '/')
+        response = self.perform_delete_request(self.HOST + f'{uuid}/')
         if response is None:
             return self.ERROR_RETURN
         return self.get_valid_json_from_response(response), response.status_code
