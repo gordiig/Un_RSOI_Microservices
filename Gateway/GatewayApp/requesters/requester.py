@@ -44,7 +44,7 @@ class Requester:
         return response
 
     # MARK: - Utility
-    def get_limit_offset_from_request(self, request) -> Union[(int, int), None]:
+    def get_limit_offset_from_request(self, request) -> Union[Tuple[int, int], None]:
         try:
             limit = request.query_params['limit']
             offset = request.query_params['offset']

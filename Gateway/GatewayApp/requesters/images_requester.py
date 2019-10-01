@@ -20,7 +20,7 @@ class ImagesRequester(Requester):
         response = self.perform_get_request(self.HOST + uuid + '/')
         if response is None:
             return self.ERROR_RETURN
-        return self.get_valid_json_from_response(response.json()), response.status_code
+        return self.get_valid_json_from_response(response), response.status_code
 
     def post_image(self, request, data: dict) -> Tuple[dict, int]:
         response = self.perform_post_request(self.HOST, data=data)
