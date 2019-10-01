@@ -9,7 +9,7 @@ class AuthRequester(Requester):
         return {'Authorization': f'Token {token}'}
 
     def get_users(self, request) -> Tuple[dict, int]:
-        host = self.BASE_HOST + 'users/'
+        host = self.HOST + 'users/'
         l_o = self.get_limit_offset_from_request(request)
         if l_o:
             host += f'?limit={l_o[0]}&offset={l_o[1]}'
@@ -22,7 +22,7 @@ class AuthRequester(Requester):
 
     def get_concrete_user(self, request, user_id: str) -> Tuple[dict, int]:
         token = self.get_token_from_request(request)
-        response = self.perform_get_request(self.HOST + f'{user_id}/', headers=self._create_auth_header(token))
+        response = self.perform_get_request(self.HOST + f'users/{user_id}/', headers=self._create_auth_header(token))
         if response is None:
             return self.ERROR_RETURN
         return self.get_valid_json_from_response(response), response.status_code
