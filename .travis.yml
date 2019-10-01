@@ -7,5 +7,5 @@ jobs:
   include:
     - stage test:
       script: python3 Images/manage.py test
-      script: python3 Audio/manage.py test
-      script: Messages/manage.py test
+      - script: python3 Audio/manage.py test
+      - script: python3 Messages/manage.py test
