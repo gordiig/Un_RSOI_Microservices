@@ -4,6 +4,6 @@ python:
 install:
   - pip install -r requirements.txt
 script:
-  - python3 Images/manage.py test
-  - python3 Audio/manage.py test
-  - python3 Messages/manage.py test
+  - python3 Images/manage.py test Images
+  - python3 Audio/manage.py test Audio
+  - python3 Messages/manage.py test Messages
