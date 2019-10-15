@@ -16,6 +16,13 @@ class AudioGetError(Exception):
         self.err_msg = err_json
 
 
+class UserGetError(Exception):
+    def __init__(self, code: int, err_json: dict):
+        super().__init__()
+        self.code = code
+        self.err_msg = err_json
+
+
 class MessagesRequester(Requester):
     HOST = Requester.BASE_HOST + ':8002/api/messages/'
 
@@ -45,6 +52,31 @@ class MessagesRequester(Requester):
         message = self.__get_and_set_message_image(message)
         return message
 
+    def __get_and_set_user_from(self, request, message: dict) -> dict:
+        from GatewayApp.requesters.auth_requester import AuthRequester
+        user_id = message['to_user_id']
+        if user_id is not None:
+            user_json, user_status = AuthRequester().get_concrete_user(request=request, user_id=user_id)
+            if user_status != 200:
+                raise UserGetError(code=user_status, err_json=user_json)
+            message['to_user'] = user_json
+        return message
+
+    def __get_and_set_user_to(self, request, message: dict) -> dict:
+        from GatewayApp.requesters.auth_requester import AuthRequester
+        user_id = message['from_user_id']
+        if user_id is not None:
+            user_json, user_status = AuthRequester().get_concrete_user(request=request, user_id=user_id)
+            if user_status != 200:
+                raise UserGetError(code=user_status, err_json=user_json)
+            message['from_user'] = user_json
+        return message
+
+    def __get_and_set_message_users(self, request, message: dict) -> dict:
+        message = self.__get_and_set_user_from(request, message)
+        message = self.__get_and_set_user_to(request, message)
+        return message
+
     def get_messages(self, request) -> Tuple[dict, int]:
         host = self.HOST
         # User info
@@ -60,6 +92,15 @@ class MessagesRequester(Requester):
         if response is None:
             return self.ERROR_RETURN
         response_json = self.next_and_prev_links_to_params(self.get_valid_json_from_response(response))
+        # Adding users
+        if isinstance(response_json, dict):
+            actual_messages = response_json['results']
+            for i in range(len(actual_messages)):
+                actual_messages[i] = self.__get_and_set_message_users(request, actual_messages[i])
+            response_json['results'] = actual_messages
+        else:
+            for i in range(len(response_json)):
+                response_json[i] = self.__get_and_set_message_users(request, response_json[i])
         return response_json, response.status_code
 
     def get_concrete_message(self, request, uuid: str) -> Tuple[dict, int]:
@@ -71,9 +112,10 @@ class MessagesRequester(Requester):
         valid_json = self.get_valid_json_from_response(response)
         try:
             ans = self.__get_and_set_message_attachments(valid_json)
+            ans = self.__get_and_set_message_users(request, ans)
         except KeyError:
             return {'error': 'Key error was raised, no image or audio uuid in message json!'}, 500
-        except (ImageGetError, AudioGetError) as e:
+        except (ImageGetError, AudioGetError, UserGetError) as e:
             return e.err_msg, e.code
         return ans, 200
 
