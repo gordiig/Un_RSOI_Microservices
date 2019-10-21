@@ -141,17 +141,26 @@ class MessagesRequester(Requester):
 
     def _check_if_attachments_exist(self, request, data: dict) -> Tuple[dict, int]:
         # Есть ли такая картинка
-        if data['image_uuid']:
-            if not self._check_if_image_exists(data['image_uuid']):
-                return {'error': f'Image with uuid "{data["image_uuid"]}" does not exist!'}, 404
+        try:
+            if data['image_uuid']:
+                if not self._check_if_image_exists(data['image_uuid']):
+                    return {'error': f'Image with uuid "{data["image_uuid"]}" does not exist!'}, 404
+        except KeyError:
+            pass
         # Есть ли такое аудио
-        if data['audio_uuid']:
-            if not self._check_if_audio_exists(data['audio_uuid']):
-                return {'error': f'Audio with uuid "{data["audio_uuid"]}" does not exist!'}, 404
+        try:
+            if data['audio_uuid']:
+                if not self._check_if_audio_exists(data['audio_uuid']):
+                    return {'error': f'Audio with uuid "{data["audio_uuid"]}" does not exist!'}, 404
+        except KeyError:
+            pass
         # Есть ли такие юзеры
-        if data['to_user_id']:
-            if not self._check_if_user_exists(request, data['to_user_id']):
-                return {'error': f'User with id "{data["to_user_id"]}" does not exist!'}, 404
+        try:
+            if data['to_user_id']:
+                if not self._check_if_user_exists(request, data['to_user_id']):
+                    return {'error': f'User with id "{data["to_user_id"]}" does not exist!'}, 404
+        except KeyError:
+            pass
         return {}, 200
 
     def _add_from_user_id_to_data(self, request, data: dict) -> Tuple[dict, int]:
