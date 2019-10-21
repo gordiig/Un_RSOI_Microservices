@@ -80,7 +80,10 @@ class Requester:
         except (ValueError, json.JSONDecodeError):
             return response.text
 
-    def get_token_from_request(self, request) -> str:
+    def get_token_from_request(self, request) -> Union[str, None]:
         token_str = request.META.get('HTTP_AUTHORIZATION')
-        token = token_str[6:]
+        try:
+            token = token_str[6:]
+        except TypeError:
+            return None
         return token

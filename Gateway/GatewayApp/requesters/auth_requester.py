@@ -29,6 +29,8 @@ class AuthRequester(Requester):
 
     def get_user_info(self, request) -> Tuple[dict, int]:
         token = self.get_token_from_request(request)
+        if token is None:
+            return {}, 403
         response = self.perform_get_request(self.HOST + 'user_info/', headers=self._create_auth_header(token))
         if response is None:
             return self.ERROR_RETURN

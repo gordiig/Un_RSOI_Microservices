@@ -163,9 +163,23 @@ class MessagesRequester(Requester):
         return data, 200
 
     def post_message(self, request, data: dict) -> Tuple[dict, int]:
-        check_json, code = self._check_if_attachments_exist(request, data)
-        if code != 200:
-            return check_json, code
+        from GatewayApp.requesters.audio_requester import AudioRequester
+        from GatewayApp.requesters.images_requester import ImagesRequester
+        # check_json, code = self._check_if_attachments_exist(request, data)
+        try:
+            upload_json, code = AudioRequester().post_audio(request, data['audio'])
+            if code != 201:
+                return upload_json, code
+            data['audio_uuid'] = upload_json['uuid']
+        except KeyError:
+            pass
+        try:
+            upload_json, code = ImagesRequester().post_image(request, data['image'])
+            if code != 201:
+                return upload_json, code
+            data['image_uuid'] = upload_json['uuid']
+        except KeyError:
+            pass
         data, code = self._add_from_user_id_to_data(request, data)
         if code != 200:
             return data, code
@@ -177,7 +191,7 @@ class MessagesRequester(Requester):
     def patch_message(self, request, uuid: str, data: dict) -> Tuple[dict, int]:
         check_json, code = self._check_if_attachments_exist(request, data)
         if code != 200:
-            return check_json, 200
+            return check_json, code
         data, code = self._add_from_user_id_to_data(request, data)
         if code != 200:
             return data, code
