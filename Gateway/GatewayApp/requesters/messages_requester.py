@@ -195,7 +195,14 @@ class MessagesRequester(Requester):
         response = self.perform_post_request(self.HOST, data=data)
         if response is None:
             return Requester.ERROR_RETURN
-        return self.get_valid_json_from_response(response), response.status_code
+        resp_json = self.get_valid_json_from_response(response)
+        try:
+            resp_json = self.__get_and_set_message_users(request, resp_json)
+        except KeyError:
+            return {'error': 'Key error was raised while getting user json!'}, 500
+        except UserGetError as e:
+            return e.err_msg, e.code
+        return resp_json, response.status_code
 
     def patch_message(self, request, uuid: str, data: dict) -> Tuple[dict, int]:
         check_json, code = self._check_if_attachments_exist(request, data)
