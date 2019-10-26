@@ -189,6 +189,11 @@ class MessagesRequester(Requester):
             data['image_uuid'] = upload_json['uuid']
         except KeyError:
             pass
+        try:
+            if not self._check_if_user_exists(request, data['to_user_id']):
+                return {'error': 'No user found with given id'}, 404
+        except KeyError:
+            return {'error': 'No to_user_id key was given'}, 400
         data, code = self._add_from_user_id_to_data(request, data)
         if code != 200:
             return data, code
@@ -196,6 +201,8 @@ class MessagesRequester(Requester):
         if response is None:
             return Requester.ERROR_RETURN
         resp_json = self.get_valid_json_from_response(response)
+        if response.status_code != 201:
+            return resp_json, response.status_code
         try:
             resp_json = self.__get_and_set_message_users(request, resp_json)
         except KeyError:
@@ -208,6 +215,11 @@ class MessagesRequester(Requester):
         check_json, code = self._check_if_attachments_exist(request, data)
         if code != 200:
             return check_json, code
+        try:
+            if not self._check_if_user_exists(request, data['to_user_id']):
+                return {'error': 'No user found with given id'}, 404
+        except KeyError:
+            return {'error': 'No to_user_id key was given'}, 400
         data, code = self._add_from_user_id_to_data(request, data)
         if code != 200:
             return data, code
