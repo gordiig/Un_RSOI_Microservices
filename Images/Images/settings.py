@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'e$1)fwqh7x_44w1($mf3kv8h0o1$h@)c4zo%c!l6+644*$)xw5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'ImagesApp',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +70,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Images.wsgi.application'
+
+
+# REST_Framework
+renderer_classes = ['rest_framework.renderers.JSONRenderer']
+if DEBUG:
+    renderer_classes += ['rest_framework.renderers.BrowsableAPIRenderer']
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': renderer_classes,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+}
 
 
 # Database

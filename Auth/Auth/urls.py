@@ -1,4 +1,4 @@
-"""Images URL Configuration
+"""Auth URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.conf.urls import url, include
+from django.conf.urls import url
+from django.urls import path, include
+from rest_framework.authtoken import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^api/', include('ImagesApp.urls')),
+    url(r'^api/token-auth/', views.obtain_auth_token),
+    url(r'^api/', include('AuthApp.urls')),
 ]
