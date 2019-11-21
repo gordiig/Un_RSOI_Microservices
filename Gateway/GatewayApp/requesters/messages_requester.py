@@ -48,8 +48,14 @@ class MessagesRequester(Requester):
         return message
 
     def __get_and_set_message_attachments(self, message: dict) -> dict:
-        message = self.__get_and_set_message_audio(message)
-        message = self.__get_and_set_message_image(message)
+        try:
+            message = self.__get_and_set_message_audio(message)
+        except AudioGetError:
+            message['audio'] = None
+        try:
+            message = self.__get_and_set_message_image(message)
+        except ImageGetError:
+            message['image'] = None
         return message
 
     def __get_and_set_user_from(self, request, message: dict) -> dict:
@@ -115,7 +121,7 @@ class MessagesRequester(Requester):
             ans = self.__get_and_set_message_users(request, ans)
         except KeyError:
             return {'error': 'Key error was raised, no image or audio uuid in message json!'}, 500
-        except (ImageGetError, AudioGetError, UserGetError) as e:
+        except UserGetError as e:
             return e.err_msg, e.code
         return ans, 200
 
