@@ -171,24 +171,29 @@ class MessagesRequester(Requester):
         data['from_user_id'] = user_json['id']
         return data, 200
 
+    def __audio_rollback(self, request, data: dict):
+        from GatewayApp.requesters.audio_requester import AudioRequester
+        try:
+            AudioRequester().delete_audio(request, data['audio_uuid'])
+        except KeyError:
+            pass
+
+    def __image_rollback(self, request, data: dict):
+        from GatewayApp.requesters.images_requester import ImagesRequester
+        try:
+            ImagesRequester().delete_image(request, data['image_uuid'])
+        except KeyError:
+            pass
+
+    def __attachments_rollback(self, request, data: dict):
+        self.__image_rollback(request, data)
+        self.__audio_rollback(request, data)
+
     def post_message(self, request, data: dict) -> Tuple[dict, int]:
         from GatewayApp.requesters.audio_requester import AudioRequester
         from GatewayApp.requesters.images_requester import ImagesRequester
         # check_json, code = self._check_if_attachments_exist(request, data)
-        try:
-            upload_json, code = AudioRequester().post_audio(request, data['audio'])
-            if code != 201:
-                return upload_json, code
-            data['audio_uuid'] = upload_json['uuid']
-        except KeyError:
-            pass
-        try:
-            upload_json, code = ImagesRequester().post_image(request, data['image'])
-            if code != 201:
-                return upload_json, code
-            data['image_uuid'] = upload_json['uuid']
-        except KeyError:
-            pass
+        # Прикрепление юзера и проверка что он вообще есть
         try:
             if not self._check_if_user_exists(request, data['to_user_id']):
                 return {'error': 'No user found with given id'}, 404
@@ -197,11 +202,31 @@ class MessagesRequester(Requester):
         data, code = self._add_from_user_id_to_data(request, data)
         if code != 200:
             return data, code
+        # ПОСТ аудио
+        try:
+            upload_json, code = AudioRequester().post_audio(request, data['audio'])
+            if code != 201:
+                return upload_json, code
+            data['audio_uuid'] = upload_json['uuid']
+        except KeyError:
+            pass
+        # ПОСТ картинки
+        try:
+            upload_json, code = ImagesRequester().post_image(request, data['image'])
+            if code != 201:
+                self.__audio_rollback(request, data)  # Rollback если в посте картинки ошибка
+                return upload_json, code
+            data['image_uuid'] = upload_json['uuid']
+        except KeyError:
+            pass
+        # Пост самого сообщения
         response = self.perform_post_request(self.HOST, data=data)
         if response is None:
+            self.__attachments_rollback(request, data)
             return Requester.ERROR_RETURN
         resp_json = self.get_valid_json_from_response(response)
         if response.status_code != 201:
+            self.__attachments_rollback(request, data)
             return resp_json, response.status_code
         try:
             resp_json = self.__get_and_set_message_users(request, resp_json)
