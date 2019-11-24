@@ -18,28 +18,28 @@ class Requester:
     def perform_get_request(self, url: str, headers: dict={}) -> Union[requests.Response, None]:
         try:
             response = requests.get(url, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
     def perform_post_request(self, url: str, data: dict={}, headers: dict={}) -> Union[requests.Response, None]:
         try:
             response = requests.post(url=url, json=data, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
     def perform_delete_request(self, url: str, headers: dict={}) -> Union[requests.Response, None]:
         try:
             response = requests.delete(url=url, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
     def perform_patch_request(self, url: str, data: dict={}, headers: dict = {}) -> Union[requests.Response, None]:
         try:
             response = requests.patch(url=url, json=data, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
