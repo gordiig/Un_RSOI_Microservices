@@ -33,6 +33,9 @@ class MessagesRequester(Requester):
         if image_uuid is not None:
             image_json, image_status = ImagesRequester().get_concrete_image(request=None, uuid=image_uuid)
             if image_status != 200:
+                from Gateway.settings import DEBUG
+                if DEBUG:
+                    print(image_json)
                 raise ImageGetError(code=image_status, err_json=image_json)
             message['image'] = image_json
         return message
@@ -43,6 +46,9 @@ class MessagesRequester(Requester):
         if audio_uuid is not None:
             audio_json, audio_status = AudioRequester().get_concrete_audio(request=None, uuid=audio_uuid)
             if audio_status != 200:
+                from Gateway.settings import DEBUG
+                if DEBUG:
+                    print(audio_json)
                 raise AudioGetError(code=audio_status, err_json=audio_json)
             message['audio'] = audio_json
         return message
