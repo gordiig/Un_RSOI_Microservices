@@ -65,10 +65,10 @@ class ImagesRequester(Requester):
             response = self._perform_post_request(self.HOST, data=data)
         except ValueError:
             Queue.add_image_task(request, data=data)
-            return self.ERROR_RETURN
+            return self.ERROR_RETURN[0], 201
         except pb.CircuitBreakerError:
             Queue.add_image_task(request, data=data)
-            return self.PB_ERROR_RETURN('Images')
+            return self.PB_ERROR_RETURN('Images')[0], 201
         Queue.fire_image_tasks()
         return self.get_valid_json_from_response(response), response.status_code
 
@@ -77,10 +77,10 @@ class ImagesRequester(Requester):
             response = self._perform_patch_request(self.HOST + f'{uuid}/', data=data)
         except ValueError:
             Queue.add_image_task(request, uuid=uuid, data=data)
-            return self.ERROR_RETURN
+            return self.ERROR_RETURN[0], 202
         except pb.CircuitBreakerError:
             Queue.add_image_task(request, uuid=uuid, data=data)
-            return self.PB_ERROR_RETURN('Images')
+            return self.PB_ERROR_RETURN('Images')[0], 202
         Queue.fire_image_tasks()
         return self.get_valid_json_from_response(response), response.status_code
 
@@ -89,9 +89,9 @@ class ImagesRequester(Requester):
             response = self._perform_delete_request(self.HOST + f'{uuid}/')
         except ValueError:
             Queue.add_image_task(request, uuid=uuid)
-            return self.ERROR_RETURN
+            return self.ERROR_RETURN[0], 204
         except pb.CircuitBreakerError:
             Queue.add_image_task(request, uuid=uuid)
-            return self.PB_ERROR_RETURN('Images')
+            return self.PB_ERROR_RETURN('Images')[0], 204
         Queue.fire_image_tasks()
         return self.get_valid_json_from_response(response), response.status_code
