@@ -5,26 +5,28 @@ from GatewayApp.requesters.images_requester import ImagesRequester
 
 class Queue:
     AUDIO, IMAGE = 'audio', 'image'
+    queue = []
 
-    def __init__(self):
-        self._queue = []
-
-    def _add_task_to_queue(self, request, data, uuid, ttype):
-        self._queue.append({
+    @staticmethod
+    def _add_task_to_queue(request, data, uuid, ttype):
+        Queue.queue.append({
             'request': request,
             'data': data,
             'uuid': uuid,
             'type': ttype,
         })
 
-    def add_image_task(self, request, data: Union[None, dict] = None, uuid: Union[None, str] = None):
-        self._add_task_to_queue(request, data, uuid, ttype=Queue.IMAGE)
+    @staticmethod
+    def add_image_task(request, data: Union[None, dict] = None, uuid: Union[None, str] = None):
+        Queue._add_task_to_queue(request, data, uuid, ttype=Queue.IMAGE)
 
-    def add_audio_task(self, request, data: Union[None, dict] = None, uuid: Union[None, str] = None):
-        self._add_task_to_queue(request, data, uuid, ttype=Queue.AUDIO)
+    @staticmethod
+    def add_audio_task(request, data: Union[None, dict] = None, uuid: Union[None, str] = None):
+        Queue._add_task_to_queue(request, data, uuid, ttype=Queue.AUDIO)
 
-    def fire_audio_tasks(self):
-        atasks = list(filter(lambda x: x['type'] == Queue.AUDIO, self._queue))
+    @staticmethod
+    def fire_audio_tasks():
+        atasks = list(filter(lambda x: x['type'] == Queue.AUDIO, Queue.queue))
         ar = AudioRequester()
         ok_code = 000
         tasks_to_delete = []
@@ -43,10 +45,11 @@ class Queue:
             if code == ok_code:
                 tasks_to_delete.append(task)
         for task in tasks_to_delete:
-            self._queue.remove(task)
+            Queue.queue.remove(task)
 
-    def fire_image_tasks(self):
-        itasks = list(filter(lambda x: x['type'] == Queue.IMAGE, self._queue))
+    @staticmethod
+    def fire_image_tasks():
+        itasks = list(filter(lambda x: x['type'] == Queue.IMAGE, Queue.queue))
         ir = ImagesRequester()
         ok_code = 000
         tasks_to_delete = []
@@ -65,4 +68,4 @@ class Queue:
             if code == ok_code:
                 tasks_to_delete.append(task)
         for task in tasks_to_delete:
-            self._queue.remove(task)
+            Queue.queue.remove(task)
