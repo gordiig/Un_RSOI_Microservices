@@ -1,6 +1,7 @@
 import pybreaker as pb
 from typing import Tuple
 from GatewayApp.requesters.requester import Requester
+from GatewayApp.Queue.Queue import Queue
 
 
 class AudioRequester(Requester):
@@ -61,8 +62,10 @@ class AudioRequester(Requester):
         try:
             response = self._perform_post_request(self.HOST, data=data)
         except ValueError:
+            Queue.add_audio_task(request, data=data)
             return self.ERROR_RETURN
         except pb.CircuitBreakerError:
+            Queue.add_audio_task(request, data=data)
             return self.PB_ERROR_RETURN('Audio')
         return self.get_valid_json_from_response(response), response.status_code
 
@@ -70,8 +73,10 @@ class AudioRequester(Requester):
         try:
             response = self._perform_patch_request(self.HOST + f'{uuid}/', data=data)
         except ValueError:
+            Queue.add_audio_task(request, uuid=uuid, data=data)
             return self.ERROR_RETURN
         except pb.CircuitBreakerError:
+            Queue.add_audio_task(request, uuid=uuid, data=data)
             return self.PB_ERROR_RETURN('Audio')
         return self.get_valid_json_from_response(response), response.status_code
 
@@ -79,7 +84,9 @@ class AudioRequester(Requester):
         try:
             response = self._perform_delete_request(self.HOST + f'{uuid}/')
         except ValueError:
+            Queue.add_audio_task(request, uuid=uuid)
             return self.ERROR_RETURN
         except pb.CircuitBreakerError:
+            Queue.add_audio_task(request, uuid=uuid)
             return self.PB_ERROR_RETURN('Audio')
         return self.get_valid_json_from_response(response), response.status_code
