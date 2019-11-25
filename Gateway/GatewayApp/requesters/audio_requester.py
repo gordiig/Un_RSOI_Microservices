@@ -47,6 +47,7 @@ class AudioRequester(Requester):
         except pb.CircuitBreakerError:
             return self.PB_ERROR_RETURN('Audio')
         response_json = self.next_and_prev_links_to_params(self.get_valid_json_from_response(response))
+        Queue.fire_audio_tasks()
         return response_json, response.status_code
 
     def get_concrete_audio(self, request, uuid: str) -> Tuple[dict, int]:
@@ -56,6 +57,7 @@ class AudioRequester(Requester):
             return self.ERROR_RETURN
         except pb.CircuitBreakerError:
             return self.PB_ERROR_RETURN('Audio')
+        Queue.fire_audio_tasks()
         return self.get_valid_json_from_response(response), response.status_code
 
     def post_audio(self, request, data: dict) -> Tuple[dict, int]:
@@ -67,6 +69,7 @@ class AudioRequester(Requester):
         except pb.CircuitBreakerError:
             Queue.add_audio_task(request, data=data)
             return self.PB_ERROR_RETURN('Audio')
+        Queue.fire_audio_tasks()
         return self.get_valid_json_from_response(response), response.status_code
 
     def patch_audio(self, request, uuid: str, data: dict) -> Tuple[dict, int]:
@@ -78,6 +81,7 @@ class AudioRequester(Requester):
         except pb.CircuitBreakerError:
             Queue.add_audio_task(request, uuid=uuid, data=data)
             return self.PB_ERROR_RETURN('Audio')
+        Queue.fire_audio_tasks()
         return self.get_valid_json_from_response(response), response.status_code
 
     def delete_audio(self, request, uuid: str) -> Tuple[dict, int]:
@@ -89,4 +93,5 @@ class AudioRequester(Requester):
         except pb.CircuitBreakerError:
             Queue.add_audio_task(request, uuid=uuid)
             return self.PB_ERROR_RETURN('Audio')
+        Queue.fire_audio_tasks()
         return self.get_valid_json_from_response(response), response.status_code
