@@ -13,25 +13,25 @@ class ImagesRequester(Requester):
     @db_breaker
     def _perform_get_request(self, host: str):
         response = self.perform_get_request(host)
-        if not response:
+        if response is None:
             raise ValueError
         return response
 
     def _perform_post_request(self, host: str, data: dict):
         response = self.perform_post_request(host, data=data)
-        if not response:
+        if response is None:
             raise ValueError
         return response
 
     def _perform_patch_request(self, host: str, data: dict):
         response = self.perform_patch_request(host, data=data)
-        if not response:
+        if response is None:
             raise ValueError
         return response
 
     def _perform_delete_request(self, host: str):
         response = self.perform_delete_request(host)
-        if not response:
+        if response is None:
             raise ValueError
         return response
 
