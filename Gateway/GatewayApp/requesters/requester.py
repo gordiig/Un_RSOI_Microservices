@@ -9,6 +9,9 @@ class Requester:
     AUTH_HOST = 'http://127.0.0.1:8001/api/'
     MESSAGES_HOST = 'http://127.0.0.1:8002/api/messages/'
     ERROR_RETURN = (json.dumps({'error': 'BaseHTTPError was raised!'}), 500)
+    def PB_ERROR_RETURN(self, app_name: str):
+        return json.dumps({'error': f'Circuit breaker for app "{app_name}" is on'}), 500
+
 
     @staticmethod
     def __create_error_message(msg: str) -> Dict:
@@ -18,28 +21,28 @@ class Requester:
     def perform_get_request(self, url: str, headers: dict={}) -> Union[requests.Response, None]:
         try:
             response = requests.get(url, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
     def perform_post_request(self, url: str, data: dict={}, headers: dict={}) -> Union[requests.Response, None]:
         try:
             response = requests.post(url=url, json=data, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
     def perform_delete_request(self, url: str, headers: dict={}) -> Union[requests.Response, None]:
         try:
             response = requests.delete(url=url, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
     def perform_patch_request(self, url: str, data: dict={}, headers: dict = {}) -> Union[requests.Response, None]:
         try:
             response = requests.patch(url=url, json=data, headers=headers)
-        except requests.exceptions.BaseHTTPError:
+        except (requests.exceptions.BaseHTTPError, requests.ConnectionError):
             return None
         return response
 
