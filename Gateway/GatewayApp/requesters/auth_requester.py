@@ -6,7 +6,8 @@ class AuthRequester(Requester):
     HOST = Requester.BASE_HOST + ':8001/api/'
 
     def _create_auth_header(self, token: str):
-        return {'Authorization': f'Token {token}'}
+        token_type = 'Bearer' if len(token) < 40 else 'Token'
+        return {'Authorization': f'{token_type} {token}'}
 
     def get_users(self, request) -> Tuple[dict, int]:
         host = self.HOST + 'users/'
