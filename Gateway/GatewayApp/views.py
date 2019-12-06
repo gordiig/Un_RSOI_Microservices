@@ -181,3 +181,27 @@ class ConcreteMessageView(BaseMessageView):
     def delete(self, request: Request, message_uuid):
         data, code = self.REQUESTER.delete_message(request=request, uuid=message_uuid)
         return Response(data, status=code)
+
+
+from django.shortcuts import redirect
+from django.views import View
+class OLoginView(View):
+    """
+    Логин в OAuth
+    """
+    def get(self, request):
+        uri = 'http://127.0.0.1:8001/o/authorize/?client_id=Gateway_id&grant_type=authorization_code'
+        return redirect(uri)
+
+
+class ORedirectView(APIView):
+    """
+    Получение токена OAuth
+    """
+    def get(self, request: Request):
+        import requests
+        code = request.query_params['code']
+        data_to_send = f'client_id=Gateway_id&client_secret=Gateway_secret&code={code}&grant_type=authorization_code'
+        ret = requests.post(url='http://127.0.0.1:8001/o/token/', data=data_to_send,
+                            headers={'content-type': 'application/x-www-form-urlencoded'})
+        return Response(ret.json(), status=ret.status_code)
