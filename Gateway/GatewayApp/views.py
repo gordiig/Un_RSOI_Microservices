@@ -110,17 +110,45 @@ class BaseImageView(APIView):
     REQUESTER = ImagesRequester()
 
 
+TOKEN = ''
+REFRESH = ''
+
+
 class ImagesView(BaseImageView):
     """
     Получение всех картинок
     """
-    permission_classes = (IsAuthenticatedThroughAuthService, )
+    # permission_classes = (IsAuthenticatedThroughAuthService, )
+
+    def _get_token(self, refresh=False):
+        import requests
+        global TOKEN, REFRESH
+        body = {
+            'server_id': 'Images_id',
+            'server_secret': 'Images_secret',
+        }
+        if refresh:
+            body['refresh_token'] = REFRESH
+        ret = requests.post('http://127.0.0.1:8003/api/server_login/', json=body)
+        print(ret.json())
+        TOKEN = ret.json()['token']
+        REFRESH = ret.json()['refresh_token']
 
     def get(self, request: Request):
+        if TOKEN == '':
+            self._get_token()
+        data, code = self.REQUESTER.get_images(request=request)
+        if code == 403:
+            self._get_token(refresh=True)
         data, code = self.REQUESTER.get_images(request=request)
         return Response(data, status=code)
 
     def post(self, request: Request):
+        if TOKEN == '':
+            self._get_token()
+        data, code = self.REQUESTER.post_image(request=request, data=request.data)
+        if code == 403:
+            self._get_token(refresh=True)
         data, code = self.REQUESTER.post_image(request=request, data=request.data)
         return Response(data, status=code)
 
@@ -190,7 +218,7 @@ class OLoginView(View):
     Логин в OAuth
     """
     def get(self, request):
-        uri = 'http://127.0.0.1:8001/o/authorize/?client_id=Gateway_id&grant_type=authorization_code'
+        uri = 'http://127.0.0.1:8001/o/authorize/?client_id=Gateway_id&grant_type=authorization_code&response_type=token'
         return redirect(uri)
 
 

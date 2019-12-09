@@ -12,13 +12,15 @@ class ImagesRequester(Requester):
     # MARK: - Requests for CB
     @db_breaker
     def _perform_get_request(self, host: str):
-        response = self.perform_get_request(host)
+        from GatewayApp.views import TOKEN
+        response = self.perform_get_request(host, headers={'Authorization': f'Bearer {TOKEN}'})
         if response is None:
             raise ValueError
         return response
 
     def _perform_post_request(self, host: str, data: dict):
-        response = self.perform_post_request(host, data=data)
+        from GatewayApp.views import TOKEN
+        response = self.perform_post_request(host, data=data, headers={'Authorization': f'Bearer {TOKEN}'})
         if response is None:
             raise ValueError
         return response
