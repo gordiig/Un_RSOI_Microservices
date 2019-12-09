@@ -86,7 +86,7 @@ class Requester:
     def get_token_from_request(self, request) -> Union[str, None]:
         token_str = request.META.get('HTTP_AUTHORIZATION')
         try:
-            token = token_str[6:]
+            token = token_str[6:].strip()
         except TypeError:
             return None
         return token

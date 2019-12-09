@@ -110,17 +110,45 @@ class BaseImageView(APIView):
     REQUESTER = ImagesRequester()
 
 
+TOKEN = ''
+REFRESH = ''
+
+
 class ImagesView(BaseImageView):
     """
     Получение всех картинок
     """
-    permission_classes = (IsAuthenticatedThroughAuthService, )
+    # permission_classes = (IsAuthenticatedThroughAuthService, )
+
+    def _get_token(self, refresh=False):
+        import requests
+        global TOKEN, REFRESH
+        body = {
+            'server_id': 'Images_id',
+            'server_secret': 'Images_secret',
+        }
+        if refresh:
+            body['refresh_token'] = REFRESH
+        ret = requests.post('http://127.0.0.1:8003/api/server_login/', json=body)
+        print(ret.json())
+        TOKEN = ret.json()['token']
+        REFRESH = ret.json()['refresh_token']
 
     def get(self, request: Request):
+        if TOKEN == '':
+            self._get_token()
+        data, code = self.REQUESTER.get_images(request=request)
+        if code == 403:
+            self._get_token(refresh=True)
         data, code = self.REQUESTER.get_images(request=request)
         return Response(data, status=code)
 
     def post(self, request: Request):
+        if TOKEN == '':
+            self._get_token()
+        data, code = self.REQUESTER.post_image(request=request, data=request.data)
+        if code == 403:
+            self._get_token(refresh=True)
         data, code = self.REQUESTER.post_image(request=request, data=request.data)
         return Response(data, status=code)
 
@@ -181,3 +209,27 @@ class ConcreteMessageView(BaseMessageView):
     def delete(self, request: Request, message_uuid):
         data, code = self.REQUESTER.delete_message(request=request, uuid=message_uuid)
         return Response(data, status=code)
+
+
+from django.shortcuts import redirect
+from django.views import View
+class OLoginView(View):
+    """
+    Логин в OAuth
+    """
+    def get(self, request):
+        uri = 'http://127.0.0.1:8001/o/authorize/?client_id=Gateway_id&grant_type=authorization_code&response_type=token'
+        return redirect(uri)
+
+
+class ORedirectView(APIView):
+    """
+    Получение токена OAuth
+    """
+    def get(self, request: Request):
+        import requests
+        code = request.query_params['code']
+        data_to_send = f'client_id=Gateway_id&client_secret=Gateway_secret&code={code}&grant_type=authorization_code'
+        ret = requests.post(url='http://127.0.0.1:8001/o/token/', data=data_to_send,
+                            headers={'content-type': 'application/x-www-form-urlencoded'})
+        return Response(ret.json(), status=ret.status_code)

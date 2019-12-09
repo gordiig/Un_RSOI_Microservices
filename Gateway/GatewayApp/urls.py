@@ -20,4 +20,7 @@ urlpatterns = [
     url(r'^messages/$', views.MessagesView.as_view()),
     url(r'^messages/(?P<message_uuid>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/$',
         views.ConcreteMessageView.as_view()),
+
+    url(r'^ologin/$', views.OLoginView.as_view()),
+    url(r'^oredirect/$', views.ORedirectView.as_view()),
 ]

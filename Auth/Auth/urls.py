@@ -17,9 +17,16 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path, include
 from rest_framework.authtoken import views
+from oauth2_provider import views as oauth2_views
+from AuthApp.views import LogInForOAuth2
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^api/token-auth/', views.obtain_auth_token),
     url(r'^api/', include('AuthApp.urls')),
+    # OAuth2
+    url(r'^accounts/login/$', LogInForOAuth2.as_view()),
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # url(r'^authorize/$', oauth2_views.AuthorizationView.as_view(), name="authorize"),
+    # url(r'^revoke-token/$', oauth2_views.RevokeTokenView.as_view(), name="revoke-token"),
 ]
